@@ -734,7 +734,7 @@
                     <div class="form-group">
                         <label for="elevenlabsApiKey">ElevenLabs API Key:</label>
                         <input 
-                            type="password" 
+                            type="text" 
                             id="elevenlabsApiKey" 
                             placeholder="Enter your ElevenLabs API key"
                             title="Get your API key from elevenlabs.io"
@@ -798,7 +798,7 @@
     <div class="form-group">
         <label for="deepgramApiKey">Deepgram API Key:</label>
         <input 
-            type="password" 
+            type="text" 
             id="deepgramApiKey" 
             placeholder="Enter your Deepgram API key"
             title="Get your API key from deepgram.com"
@@ -995,9 +995,11 @@ function newSession() {
     // Clear conversation history and chat display
     clearChat();
     
-    // Clear transcription box
-    const transcriptionBox = document.getElementById('transcriptionBox');
-    transcriptionBox.innerHTML = '<span style="color: var(--text-secondary);">Transcription will appear here when you speak...</span>';
+    // Clear review transcript box
+const reviewTranscript = document.getElementById('reviewTranscript');
+if (reviewTranscript) {
+    reviewTranscript.textContent = 'No message to review yet';
+}
     
     // Reset recording state
     if (isRecording) {
@@ -2929,6 +2931,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
