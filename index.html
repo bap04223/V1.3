@@ -639,8 +639,9 @@
         
            
         <!-- Main content grid -->
-        <!-- Configuration section -->
-<div class="card">
+        <div class="grid">
+            <!-- Configuration section -->
+            <div class="card">
     <h2>⚙️ Configuration</h2>
     
     <!-- Chatbot Configuration Section - NEW -->
@@ -3233,7 +3234,7 @@ if (!submitWebhookUrl) {
         elevenlabsVoice: document.getElementById('elevenlabsVoice').value,
         deepgramApiKey: document.getElementById('deepgramApiKey').value, // Add this line
         deepgramModel: document.getElementById('deepgramModel').value, // Add this line
-        deepgramLanguage: document.getElementById('deepgramLanguage').value // Add this line
+        deepgramLanguage: document.getElementById('deepgramLanguage').value, // Add this line
         configSheetId: document.getElementById('configSheetId').value,
         selectedChatbot: document.getElementById('chatbotSelect').value,
         scenarioSetsId: document.getElementById('scenarioSetsId').value,
@@ -3297,6 +3298,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
