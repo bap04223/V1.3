@@ -456,6 +456,31 @@
             color: white;
             cursor: not-allowed;
         }
+
+/* Status Button States - Add after existing button styles */
+.btn-status-pending {
+    background-color: var(--danger-color) !important;
+    color: white !important;
+    position: relative;
+}
+
+.btn-status-pending:hover {
+    background-color: #dc2626 !important;
+}
+
+.btn-status-completed {
+    background-color: var(--success-color) !important;
+    color: white !important;
+}
+
+.btn-status-completed:hover {
+    background-color: #047857 !important;
+}
+
+.btn-status-completed::after {
+    content: " ✓";
+    font-weight: bold;
+}
         
         /* Image Modal Styling */
         .image-modal {
@@ -614,80 +639,113 @@
         
            
         <!-- Main content grid -->
-        <div class="grid">
-            <!-- Configuration section -->
-            <div class="card">
-                <h2>⚙️ Configuration</h2>
-                
-                <!-- n8n webhook URL input -->
-                <div class="form-group">
-                    <label for="webhookUrl">n8n Webhook URL (Chat):</label>
-                    <input 
-                        type="url" 
-                        id="webhookUrl" 
-                        placeholder="https://your-n8n-instance.com/webhook/..."
-                        title="Enter your n8n webhook URL that will receive the messages"
-                    >
-                </div>
-                
-                <!-- Submit webhook URL input -->
-                <div class="form-group">
-                    <label for="submitWebhookUrl">n8n Submit Webhook URL:</label>
-                    <input 
-                        type="url" 
-                        id="submitWebhookUrl" 
-                        placeholder="https://your-n8n-instance.com/webhook/submit..."
-                        title="Enter your n8n webhook URL for submitting conversation history"
-                    >
-                </div>
-                
-                <!-- Google Sheets configuration -->
-                <div class="form-group">
-                    <label for="sheetId">Google Sheet ID:</label>
-                    <input 
-                        type="text" 
-                        id="sheetId" 
-                        placeholder="1ABC...xyz"
-                        title="The ID from your Google Sheets URL"
-                    >
-                    <button 
-                        class="btn-secondary" 
-                        onclick="loadSheetNames()" 
-                        style="margin-top: 10px; width: 100%;"
-                    >
-                        📋 Get Sheet Names
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <label for="sheetName">Sheet Name:</label>
-                    <select id="sheetName" disabled>
-                        <option value="">Get sheet names first...</option>
-                    </select>
-                </div>
-                
-                <!-- Scenario selection dropdown -->
-                <div class="form-group" style="margin-top: 20px;">
-                    <label for="scenarioSelect">Select Scenario:</label>
-                    <select id="scenarioSelect" disabled>
-                        <option value="">Load sheet data first...</option>
-                    </select>
-                </div>
-                
-                <button class="btn-secondary" onclick="selectRandomScenario()" style="margin-top: 10px;">
-                    🎲 Random Scenario
-                </button>
-                
-                <!-- Patient Image Button -->
-                <button 
-                    class="patient-image-btn disabled" 
-                    id="patientImageBtn"
-                    onclick="showPatientImage()"
-                    disabled
-                >
-                    📷 No Scenario Selected
-                </button>
-            </div>
+        <!-- Configuration section -->
+<div class="card">
+    <h2>⚙️ Configuration</h2>
+    
+    <!-- Chatbot Configuration Section - NEW -->
+    <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
+        <label for="configSheetId">Chatbot ID's:</label>
+        <input 
+            type="password" 
+            id="configSheetId" 
+            placeholder="Google Sheet ID containing chatbot configurations"
+            title="The Google Sheet ID containing your chatbot configurations"
+            autocomplete="new-password"
+            style="font-size: 14px;"
+        >
+        <button 
+            class="btn-secondary btn-status-pending" 
+            onclick="loadChatbotConfigurations()" 
+            style="width: 100%; margin-top: 10px; font-size: 14px;"
+            id="loadChatbotBtn"
+        >
+            Load Chatbot Configurations
+        </button>
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="chatbotSelect">Select Chatbot:</label>
+            <select id="chatbotSelect" disabled style="font-size: 14px;">
+                <option value="">Load configurations first...</option>
+            </select>
+        </div>
+        
+        <button 
+            class="btn-info btn-status-pending" 
+            onclick="applyChatbotConfiguration()" 
+            style="width: 100%; font-size: 14px; margin-top: 10px;"
+            disabled
+            id="applyChatbotBtn"
+        >
+            Apply Selected Chatbot
+        </button>
+    </div>
+    
+    <!-- Hidden webhook fields - populated by chatbot configuration -->
+    <input type="hidden" id="webhookUrl" />
+    <input type="hidden" id="submitWebhookUrl" />
+    
+    <!-- Scenario Sets Management Section - NEW -->
+    <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
+        <label for="scenarioSetsId">Scenario Sets List:</label>
+        <input 
+            type="password" 
+            id="scenarioSetsId" 
+            placeholder="Google Sheet ID containing list of scenario sets"
+            title="The Google Sheet ID containing your scenario sets list"
+            autocomplete="new-password"
+            style="font-size: 14px;"
+        >
+        <button 
+            class="btn-secondary btn-status-pending" 
+            onclick="loadScenarioSets()" 
+            style="width: 100%; margin-top: 10px; font-size: 14px;"
+            id="loadSetsBtn"
+        >
+            Load Scenario Sets
+        </button>
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="scenarioSetSelect">Select Scenario Set:</label>
+            <select id="scenarioSetSelect" disabled style="font-size: 14px;">
+                <option value="">Load scenario sets first...</option>
+            </select>
+        </div>
+        
+        <!-- Hidden field - automatically populated from scenario set selection -->
+        <input type="hidden" id="sheetId">
+    </div>
+    
+    <!-- Google Sheets configuration - MODIFIED -->
+    <div class="form-group">
+        <label for="sheetName">Sheet Name:</label>
+        <select id="sheetName" disabled>
+            <option value="">Select scenario set first</option>
+        </select>
+    </div>
+    
+    <!-- Scenario selection dropdown -->
+    <div class="form-group" style="margin-top: 20px;">
+        <label for="scenarioSelect">Select Scenario:</label>
+        <select id="scenarioSelect" disabled>
+            <option value="">Load sheet data first...</option>
+        </select>
+    </div>
+    
+    <button class="btn-secondary" onclick="selectRandomScenario()" style="margin-top: 10px;">
+        🎲 Random Scenario
+    </button>
+    
+    <!-- Patient Image Button -->
+    <button 
+        class="patient-image-btn disabled" 
+        id="patientImageBtn"
+        onclick="showPatientImage()"
+        disabled
+    >
+        📷 No Scenario Selected
+    </button>
+</div>
             
             <!-- Voice control section -->
             <div class="card">
@@ -931,6 +989,14 @@
         let deepgramApiKey = ''; // Deepgram API key
         let mediaRecorder = null; // MediaRecorder for Deepgram streaming
         let audioStream = null; // Audio stream from microphone
+
+                // ===== CHATBOT CONFIGURATION VARIABLES =====
+        let chatbotConfigurations = [];     // Store loaded chatbot configurations
+        let currentChatbotConfig = null;    // Currently selected chatbot configuration
+        
+        // ===== SCENARIO SETS VARIABLES =====
+        let scenarioSets = [];              // Store loaded scenario sets
+        let currentScenarioSet = null;      // Currently selected scenario set
         
         // ===== INITIALIZATION =====
         // This runs when the page loads
@@ -947,6 +1013,9 @@
             
             // Set up event listeners
             setupEventListeners();
+                        // ADD THESE NEW LINES in setupEventListeners():
+            document.getElementById('configSheetId').addEventListener('change', saveConfig);
+            document.getElementById('scenarioSetsId').addEventListener('change', saveConfig);
             
             // Load saved configuration from localStorage
             loadSavedConfig();
@@ -1859,6 +1928,291 @@ function hideReviewSection() {
 
         // ===== GOOGLE SHEETS INTEGRATION =====
         // Load sheet names from Google Sheets
+        // ===== CHATBOT CONFIGURATION MANAGEMENT =====
+
+// Load chatbot configurations from Google Sheet
+async function loadChatbotConfigurations() {
+    const configSheetId = document.getElementById('configSheetId').value;
+    
+    if (!configSheetId) {
+        showStatus('Please enter Configuration Sheet ID first', 'error');
+        return;
+    }
+    
+    // Disable the load button and show loading state
+    const loadBtn = document.getElementById('loadChatbotBtn');
+    loadBtn.disabled = true;
+    loadBtn.innerHTML = '⏳ Loading...';
+    
+    showStatus('Loading chatbot configurations...', 'info');
+    
+    try {
+        const apiKey = 'AIzaSyDCrWAPXe6eYugvmnO1eJb7-S4QXQj3EgQ';
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${configSheetId}/values/Sheet1?key=${apiKey}`;
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.values && data.values.length > 1) {
+            chatbotConfigurations = [];
+            
+            for (let i = 1; i < data.values.length; i++) {
+                const row = data.values[i];
+                if (row.length >= 3 && row[0] && row[1] && row[2]) {
+                    chatbotConfigurations.push({
+                        name: row[0].trim(),
+                        webhookUrl: row[1].trim(),
+                        submitWebhookUrl: row[2].trim(),
+                        description: row[3] ? row[3].trim() : ''
+                    });
+                }
+            }
+            
+            populateChatbotDropdown();
+            showStatus(`Loaded ${chatbotConfigurations.length} chatbot configurations`, 'success');
+            setButtonCompleted('loadChatbotBtn', 'Configurations Loaded');
+            
+        } else {
+            showStatus('No configuration data found in the sheet', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error loading chatbot configurations:', error);
+        showStatus('Error loading configurations. Check console for details.', 'error');
+        setButtonStatus('loadChatbotBtn', 'pending', 'Load Failed - Retry');
+    }
+}
+
+// Populate the chatbot selection dropdown
+function populateChatbotDropdown() {
+    const select = document.getElementById('chatbotSelect');
+    select.innerHTML = '<option value="">Select a chatbot configuration...</option>';
+    select.disabled = false;
+    
+    chatbotConfigurations.forEach((config, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        
+        if (config.description) {
+            option.textContent = `${config.name} - ${config.description}`;
+        } else {
+            option.textContent = config.name;
+        }
+        
+        select.appendChild(option);
+    });
+    
+    document.getElementById('applyChatbotBtn').disabled = false;
+    
+    select.addEventListener('change', function() {
+        const applyBtn = document.getElementById('applyChatbotBtn');
+        if (this.value !== '') {
+            applyBtn.disabled = false;
+            applyBtn.textContent = `✅ Apply ${chatbotConfigurations[this.value].name}`;
+        } else {
+            applyBtn.disabled = true;
+            applyBtn.textContent = '✅ Apply Selected Configuration';
+        }
+    });
+}
+
+// Apply the selected chatbot configuration
+function applyChatbotConfiguration() {
+    const selectElement = document.getElementById('chatbotSelect');
+    const selectedIndex = selectElement.value;
+    
+    if (selectedIndex === '' || !chatbotConfigurations[selectedIndex]) {
+        showStatus('Please select a chatbot configuration first', 'error');
+        return;
+    }
+    
+    const config = chatbotConfigurations[selectedIndex];
+    currentChatbotConfig = config;
+    
+    document.getElementById('webhookUrl').value = config.webhookUrl;
+    document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl;
+    
+    saveConfig();
+    
+    showStatus(`✅ Applied configuration: ${config.name}`, 'success');
+    setButtonCompleted('applyChatbotBtn', `Applied: ${config.name}`);
+    
+    if (conversationHistory.length > 0) {
+        const shouldClear = confirm('Apply new chatbot configuration? This will clear the current conversation.');
+        if (shouldClear) {
+            clearChat();
+            addMessage(`Switched to: ${config.name}`, 'system');
+        }
+    } else {
+        addMessage(`Chatbot configured: ${config.name}`, 'system');
+    }
+    
+    console.log('Applied chatbot configuration:', config);
+}
+
+// ===== SCENARIO SETS MANAGEMENT =====
+
+// Load scenario sets from Google Sheet
+async function loadScenarioSets() {
+    const scenarioSetsId = document.getElementById('scenarioSetsId').value;
+    
+    if (!scenarioSetsId) {
+        showStatus('Please enter Scenario Sets Sheet ID first', 'error');
+        return;
+    }
+    
+    const loadBtn = document.getElementById('loadSetsBtn');
+    loadBtn.disabled = true;
+    loadBtn.innerHTML = '⏳ Loading...';
+    
+    showStatus('Loading scenario sets...', 'info');
+    
+    try {
+        const apiKey = 'AIzaSyDCrWAPXe6eYugvmnO1eJb7-S4QXQj3EgQ';
+        let url = `https://sheets.googleapis.com/v4/spreadsheets/${scenarioSetsId}/values/Sheet1?key=${apiKey}`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+            mode: 'cors'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.values && data.values.length > 1) {
+            scenarioSets = [];
+            
+            for (let i = 1; i < data.values.length; i++) {
+                const row = data.values[i];
+                if (row.length >= 2 && row[0] && row[1]) {
+                    scenarioSets.push({
+                        name: row[0].trim(),
+                        sheetId: row[1].trim(),
+                        description: row[2] ? row[2].trim() : ''
+                    });
+                }
+            }
+            
+            populateScenarioSetsDropdown();
+            showStatus(`Loaded ${scenarioSets.length} scenario sets`, 'success');
+            setButtonCompleted('loadSetsBtn', 'Sets Loaded');
+            
+        } else {
+            showStatus('No scenario sets data found in the sheet', 'error');
+            loadBtn.disabled = false;
+            loadBtn.innerHTML = '❌ No Data Found';
+        }
+        
+    } catch (error) {
+        console.error('Error loading scenario sets:', error);
+        
+        if (error.message.includes('Failed to fetch')) {
+            showStatus('CORS error: Please ensure your Google Sheet is publicly accessible (Anyone with link can view)', 'error');
+        } else {
+            showStatus('Error loading scenario sets. Check console for details.', 'error');
+        }
+        
+        setButtonStatus('loadSetsBtn', 'pending', 'Load Failed - Retry');
+    }
+}
+
+// Populate the scenario sets selection dropdown
+function populateScenarioSetsDropdown() {
+    const select = document.getElementById('scenarioSetSelect');
+    select.innerHTML = '<option value="">Select a scenario set...</option>';
+    select.disabled = false;
+    
+    scenarioSets.forEach((scenarioSet, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        
+        if (scenarioSet.description) {
+            option.textContent = `${scenarioSet.name} - ${scenarioSet.description}`;
+        } else {
+            option.textContent = scenarioSet.name;
+        }
+        
+        select.appendChild(option);
+    });
+    
+    select.addEventListener('change', function() {
+        if (this.value !== '') {
+            applyScenarioSet();
+        }
+    });
+}
+
+// Apply the selected scenario set
+function applyScenarioSet() {
+    const selectElement = document.getElementById('scenarioSetSelect');
+    const selectedIndex = selectElement.value;
+    
+    if (selectedIndex === '' || !scenarioSets[selectedIndex]) {
+        showStatus('Please select a scenario set first', 'error');
+        return;
+    }
+    
+    const scenarioSet = scenarioSets[selectedIndex];
+    currentScenarioSet = scenarioSet;
+    
+    document.getElementById('sheetId').value = scenarioSet.sheetId;
+    
+    sheetData = [];
+    document.getElementById('sheetName').innerHTML = '<option value="">Loading sheet names...</option>';
+    document.getElementById('sheetName').disabled = true;
+    document.getElementById('scenarioSelect').innerHTML = '<option value="">Load sheet data first...</option>';
+    document.getElementById('scenarioSelect').disabled = true;
+    
+    currentScenario = null;
+    updatePatientImageButton();
+    
+    saveConfig();
+    
+    showStatus(`✅ Applied scenario set: ${scenarioSet.name}`, 'success');
+    
+    console.log('Auto-loading sheet names for scenario set:', scenarioSet.name);
+    loadSheetNames();
+    
+    console.log('Applied scenario set:', scenarioSet);
+}
+
+// ===== BUTTON STATUS MANAGEMENT =====
+function setButtonStatus(buttonId, status, newText = null) {
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+    
+    button.classList.remove('btn-status-pending', 'btn-status-completed');
+    
+    if (status === 'pending') {
+        button.classList.add('btn-status-pending');
+    } else if (status === 'completed') {
+        button.classList.add('btn-status-completed');
+    }
+    
+    if (newText) {
+        button.innerHTML = newText;
+    }
+}
+
+function setButtonCompleted(buttonId, successText = null) {
+    setButtonStatus(buttonId, 'completed', successText);
+}
+
+function setButtonPending(buttonId, pendingText = null) {
+    setButtonStatus(buttonId, 'pending', pendingText);
+}
+
         
         async function loadSheetNames() {
             const sheetId = document.getElementById('sheetId').value;
@@ -2406,12 +2760,12 @@ function hideReviewSection() {
         
         async function sendToWebhook(message) {
             const webhookUrl = document.getElementById('webhookUrl').value;
-            
-            if (!webhookUrl) {
-                showStatus('Webhook URL not configured', 'error');
-                return;
-            }
-            
+
+if (!webhookUrl) {
+    showStatus('Webhook URL not configured. Please select a chatbot first.', 'error');
+    return;
+}
+         
             // Show loading spinner
             addMessage('<div class="spinner"></div>', 'ai');
             
@@ -2519,11 +2873,11 @@ function hideReviewSection() {
         
         async function submitConversation() {
             const submitWebhookUrl = document.getElementById('submitWebhookUrl').value;
-            
-            if (!submitWebhookUrl) {
-                showStatus('Submit webhook URL not configured', 'error');
-                return;
-            }
+
+if (!submitWebhookUrl) {
+    showStatus('Submit webhook URL not configured. Please select a chatbot first.', 'error');
+    return;
+}
             
             if (conversationHistory.length === 0) {
                 showStatus('No conversation to submit', 'error');
@@ -2880,6 +3234,10 @@ function hideReviewSection() {
         deepgramApiKey: document.getElementById('deepgramApiKey').value, // Add this line
         deepgramModel: document.getElementById('deepgramModel').value, // Add this line
         deepgramLanguage: document.getElementById('deepgramLanguage').value // Add this line
+        configSheetId: document.getElementById('configSheetId').value,
+        selectedChatbot: document.getElementById('chatbotSelect').value,
+        scenarioSetsId: document.getElementById('scenarioSetsId').value,
+        selectedScenarioSet: document.getElementById('scenarioSetSelect').value,
     };
     localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
 }
@@ -2892,6 +3250,14 @@ function hideReviewSection() {
                 document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl || '';
                 document.getElementById('sheetId').value = config.sheetId || '';
                 document.getElementById('elevenlabsApiKey').value = config.elevenlabsApiKey || '';
+                // ADD THESE NEW LINES after the existing config loading:
+                document.getElementById('configSheetId').value = config.configSheetId || '';
+                document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
+                
+                // Restore saved chatbot selection if configurations are already loaded
+                if (config.selectedChatbot && chatbotConfigurations.length > 0) {
+                    document.getElementById('chatbotSelect').value = config.selectedChatbot;
+                }
                 
                 // Try to set sheet name in dropdown first
                 const sheetNameDropdown = document.getElementById('sheetName');
@@ -2931,6 +3297,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
