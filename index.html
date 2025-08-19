@@ -1320,26 +1320,32 @@ function findBestBrowserVoice(microsoftVoiceId) {
         // This runs when the page loads
         
         window.onload = function() {
-            // Generate unique session ID for this training session
-            generateSessionId();
-            
-            // Initialize speech recognition if available
-            initializeSpeechRecognition();
-            
-            // Load available voices for text-to-speech
+    // Generate unique session ID for this training session
+    generateSessionId();
+    
+    // Initialize speech recognition if available
+    initializeSpeechRecognition();
+    
+    // Load available voices for text-to-speech
+    loadVoices();
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Load saved configuration from localStorage
+    loadSavedConfig();
+    
+    // Display session info
+    displaySessionInfo();
+    
+    // Ensure voices are loaded periodically (Chrome fix)
+    setTimeout(() => {
+        if (synthesis.getVoices().length === 0) {
+            console.log('Voices still not loaded, trying again...');
             loadVoices();
-            
-            // Set up event listeners
-            setupEventListeners();
-                
-            // Load saved configuration from localStorage
-            loadSavedConfig();
-            
-            // Display session info
-            displaySessionInfo();
-
-           
-        };
+        }
+    }, 1000);
+};
         
         // ===== SESSION MANAGEMENT =====
         // Generate and manage unique session IDs
@@ -1978,6 +1984,12 @@ recognition.onend = function() {
             if (config.selectedVoice) {
                 voiceSelect.value = config.selectedVoice;
             }
+        }
+        
+        // IMPORTANT: If we have a current scenario, try to set its voice now that voices are loaded
+        if (currentScenario) {
+            console.log('Voices loaded, updating scenario voice...');
+            updateVoiceFromScenario();
         }
     }
 }
@@ -2713,7 +2725,8 @@ function setButtonPending(buttonId, pendingText = null) {
             }
         }
         
-       // Handle scenario selection
+      
+// Handle scenario selection
 function selectScenario(rowIndex) {
     const headers = sheetData[0];
     const row = sheetData[rowIndex];
@@ -2736,13 +2749,24 @@ function selectScenario(rowIndex) {
     // Add initial message
     addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
     
-    // Update voice from scenario
-    updateVoiceFromScenario();
+    // Update voice from scenario - with retry mechanism for async voice loading
+    updateVoiceFromScenarioWithRetry();
 }
 
         // Function to apply voice from scenario data
 function updateVoiceFromScenario() {
-    if (!currentScenario) return;
+    if (!currentScenario) {
+        console.log('No current scenario, skipping voice update');
+        return;
+    }
+    
+    const voices = synthesis.getVoices();
+    console.log('Available voices for scenario voice setting:', voices.length);
+    
+    if (voices.length === 0) {
+        console.log('No voices available yet, cannot set scenario voice');
+        return;
+    }
     
     // Check for voice selection in various possible column names
     const scenarioVoice = currentScenario['Voice'] || 
@@ -2759,33 +2783,54 @@ function updateVoiceFromScenario() {
         
         // Check if it's a Microsoft voice ID (like en-US-AriaNeural)
         if (trimmedVoice.includes('-') && trimmedVoice.includes('Neural')) {
+            console.log('Detected Microsoft voice ID, finding browser equivalent...');
             // Try to find corresponding browser voice
             const browserVoice = findBestBrowserVoice(trimmedVoice);
             if (browserVoice) {
                 voiceSelect.value = browserVoice.name;
-                console.log('Mapped Microsoft voice to browser voice:', trimmedVoice, '->', browserVoice.name);
+                console.log('Successfully mapped Microsoft voice to browser voice:', trimmedVoice, '->', browserVoice.name);
                 showStatus(`Voice set: ${browserVoice.name}`, 'success');
             } else {
                 console.warn('Could not find browser voice for Microsoft voice:', trimmedVoice);
                 showStatus(`Voice "${trimmedVoice}" not available on this system`, 'warning');
             }
         } else {
+            console.log('Detected direct browser voice name, searching...');
             // Direct browser voice name
-            const voices = synthesis.getVoices();
             const directMatch = voices.find(voice => voice.name === trimmedVoice);
             if (directMatch) {
                 voiceSelect.value = trimmedVoice;
-                console.log('Direct voice match found:', trimmedVoice);
+                console.log('Direct voice match found and set:', trimmedVoice);
                 showStatus(`Voice set: ${trimmedVoice}`, 'success');
             } else {
                 console.warn('Direct voice not found:', trimmedVoice);
+                console.log('Available voice names:', voices.map(v => v.name));
                 showStatus(`Voice "${trimmedVoice}" not available on this system`, 'warning');
             }
         }
         
         // Save the configuration
         saveConfig();
+    } else {
+        console.log('No voice specified in scenario data');
     }
+}
+
+        // Function to update voice with retry mechanism for async voice loading
+function updateVoiceFromScenarioWithRetry() {
+    const voices = synthesis.getVoices();
+    
+    if (voices.length === 0) {
+        // Voices not loaded yet, wait and retry
+        console.log('Voices not loaded yet, retrying in 500ms...');
+        setTimeout(() => {
+            updateVoiceFromScenarioWithRetry();
+        }, 500);
+        return;
+    }
+    
+    // Voices are loaded, proceed with setting
+    updateVoiceFromScenario();
 }
         
         // Update patient image button state based on scenario
@@ -3876,6 +3921,7 @@ function autoSelectBestVoice(voices) {
     </script>
 </body>
 </html>
+
 
 
 
