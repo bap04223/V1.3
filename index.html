@@ -804,13 +804,89 @@
                 </div>
                 
                 <!-- Browser TTS Settings -->
-                <div id="browserTtsSettings" class="tts-settings">
-                    <div class="form-group">
-                        <label for="voiceSelect">Browser Voice:</label>
-                        <select id="voiceSelect">
-                            <option value="">Loading voices...</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+    <label for="voiceSelect">Browser Voice:</label>
+    <select id="voiceSelect">
+        <option value="">Auto-Select Best Available</option>
+        
+        <!-- US English Female Voices -->
+        <optgroup label="🇺🇸 US English - Female">
+            <option value="Microsoft Aria Online (Natural) - English (United States)">Aria - Professional Female</option>
+            <option value="Microsoft Jenny Online (Natural) - English (United States)">Jenny - Conversational Female</option>
+            <option value="Microsoft Amber Online (Natural) - English (United States)">Amber - Warm Female</option>
+            <option value="Microsoft Elizabeth Online (Natural) - English (United States)">Elizabeth - Mature Female</option>
+            <option value="Microsoft Michelle Online (Natural) - English (United States)">Michelle - Young Female</option>
+            <option value="Microsoft Ana Online (Natural) - English (United States)">Ana - Friendly Female</option>
+            <option value="Microsoft Ava Online (Natural) - English (United States)">Ava - Young Female</option>
+            <option value="Microsoft Emma Online (Natural) - English (United States)">Emma - Young Female</option>
+            <option value="Microsoft Jane Online (Natural) - English (United States)">Jane - Young Female</option>
+            <option value="Microsoft Nancy Online (Natural) - English (United States)">Nancy - Young Female</option>
+            <option value="Microsoft Sara Online (Natural) - English (United States)">Sara - Adult Female</option>
+        </optgroup>
+        
+        <!-- US English Male Voices -->
+        <optgroup label="🇺🇸 US English - Male">
+            <option value="Microsoft Guy Online (Natural) - English (United States)">Guy - Casual Male</option>
+            <option value="Microsoft Davis Online (Natural) - English (United States)">Davis - Professional Male</option>
+            <option value="Microsoft Christopher Online (Natural) - English (United States)">Christopher - Mature Male</option>
+            <option value="Microsoft Eric Online (Natural) - English (United States)">Eric - Young Male</option>
+            <option value="Microsoft Brian Online (Natural) - English (United States)">Brian - Deep Male</option>
+            <option value="Microsoft Andrew Online (Natural) - English (United States)">Andrew - Adult Male</option>
+            <option value="Microsoft Jacob Online (Natural) - English (United States)">Jacob - Young Male</option>
+            <option value="Microsoft Jason Online (Natural) - English (United States)">Jason - Adult Male</option>
+            <option value="Microsoft Tony Online (Natural) - English (United States)">Tony - Adult Male</option>
+            <option value="Microsoft Ryan Online (Natural) - English (United States)">Ryan - Adult Male</option>
+        </optgroup>
+        
+        <!-- UK English Voices -->
+        <optgroup label="🇬🇧 UK English - Female">
+            <option value="Microsoft Sonia Online (Natural) - English (United Kingdom)">Sonia - Professional British Female</option>
+            <option value="Microsoft Libby Online (Natural) - English (United Kingdom)">Libby - Young British Female</option>
+            <option value="Microsoft Maisie Online (Natural) - English (United Kingdom)">Maisie - Child British Female</option>
+            <option value="Microsoft Abbi Online (Natural) - English (United Kingdom)">Abbi - Young British Female</option>
+            <option value="Microsoft Bella Online (Natural) - English (United Kingdom)">Bella - Young British Female</option>
+            <option value="Microsoft Hollie Online (Natural) - English (United Kingdom)">Hollie - Young British Female</option>
+        </optgroup>
+        
+        <optgroup label="🇬🇧 UK English - Male">
+            <option value="Microsoft Ryan Online (Natural) - English (United Kingdom)">Ryan - Professional British Male</option>
+            <option value="Microsoft Thomas Online (Natural) - English (United Kingdom)">Thomas - Adult British Male</option>
+            <option value="Microsoft Noah Online (Natural) - English (United Kingdom)">Noah - Young British Male</option>
+            <option value="Microsoft Oliver Online (Natural) - English (United Kingdom)">Oliver - Young British Male</option>
+            <option value="Microsoft Elliot Online (Natural) - English (United Kingdom)">Elliot - Young British Male</option>
+        </optgroup>
+        
+        <!-- Australian English Voices -->
+        <optgroup label="🇦🇺 Australian English - Female">
+            <option value="Microsoft Natasha Online (Natural) - English (Australia)">Natasha - Professional Australian Female</option>
+            <option value="Microsoft Freya Online (Natural) - English (Australia)">Freya - Young Australian Female</option>
+            <option value="Microsoft Annette Online (Natural) - English (Australia)">Annette - Adult Australian Female</option>
+            <option value="Microsoft Carly Online (Natural) - English (Australia)">Carly - Adult Australian Female</option>
+        </optgroup>
+        
+        <optgroup label="🇦🇺 Australian English - Male">
+            <option value="Microsoft William Online (Natural) - English (Australia)">William - Professional Australian Male</option>
+            <option value="Microsoft Ken Online (Natural) - English (Australia)">Ken - Adult Australian Male</option>
+            <option value="Microsoft Neil Online (Natural) - English (Australia)">Neil - Adult Australian Male</option>
+            <option value="Microsoft Tim Online (Natural) - English (Australia)">Tim - Adult Australian Male</option>
+        </optgroup>
+        
+        <!-- Canadian English Voices -->
+        <optgroup label="🇨🇦 Canadian English - Female">
+            <option value="Microsoft Clara Online (Natural) - English (Canada)">Clara - Professional Canadian Female</option>
+            <option value="Microsoft Vivian Online (Natural) - English (Canada)">Vivian - Adult Canadian Female</option>
+        </optgroup>
+        
+        <optgroup label="🇨🇦 Canadian English - Male">
+            <option value="Microsoft Liam Online (Natural) - English (Canada)">Liam - Professional Canadian Male</option>
+        </optgroup>
+        
+        <!-- System Voices Section -->
+        <optgroup label="📱 Available System Voices" id="systemVoicesGroup">
+            <!-- This will be populated by JavaScript -->
+        </optgroup>
+    </select>
+</div>
                     
                     <div class="form-group">
                         <label for="speechRate">Speech Rate:</label>
@@ -1105,6 +1181,138 @@
         // ===== MULTI-IMAGE GALLERY VARIABLES =====
         let currentImageIndex = 0;
         let patientImages = [];
+
+        // ===== VOICE MAPPING DATABASE =====
+// Map Microsoft voice IDs to browser voice names and fallbacks
+const voiceDatabase = {
+    // US English Female
+    'en-US-AriaNeural': {
+        browserNames: ['Microsoft Aria Online (Natural) - English (United States)', 'Microsoft Aria - English (United States)', 'Aria'],
+        fallbackPattern: /aria|professional.*female|business.*female/i,
+        gender: 'female',
+        locale: 'en-US',
+        description: 'Professional Female'
+    },
+    'en-US-JennyNeural': {
+        browserNames: ['Microsoft Jenny Online (Natural) - English (United States)', 'Microsoft Jenny - English (United States)', 'Jenny'],
+        fallbackPattern: /jenny|conversational.*female|friendly.*female/i,
+        gender: 'female',
+        locale: 'en-US',
+        description: 'Conversational Female'
+    },
+    'en-US-AmberNeural': {
+        browserNames: ['Microsoft Amber Online (Natural) - English (United States)', 'Microsoft Amber - English (United States)', 'Amber'],
+        fallbackPattern: /amber|warm.*female/i,
+        gender: 'female',
+        locale: 'en-US',
+        description: 'Warm Female'
+    },
+    // Add more voice mappings as needed...
+    
+    // US English Male
+    'en-US-DavisNeural': {
+        browserNames: ['Microsoft Davis Online (Natural) - English (United States)', 'Microsoft Davis - English (United States)', 'Davis'],
+        fallbackPattern: /davis|professional.*male|business.*male/i,
+        gender: 'male',
+        locale: 'en-US',
+        description: 'Professional Male'
+    },
+    'en-US-GuyNeural': {
+        browserNames: ['Microsoft Guy Online (Natural) - English (United States)', 'Microsoft Guy - English (United States)', 'Guy'],
+        fallbackPattern: /guy|casual.*male/i,
+        gender: 'male',
+        locale: 'en-US',
+        description: 'Casual Male'
+    },
+    
+    // UK English
+    'en-GB-SoniaNeural': {
+        browserNames: ['Microsoft Sonia Online (Natural) - English (United Kingdom)', 'Microsoft Sonia - English (United Kingdom)', 'Sonia'],
+        fallbackPattern: /sonia|british.*female|uk.*female/i,
+        gender: 'female',
+        locale: 'en-GB',
+        description: 'Professional British Female'
+    },
+    'en-GB-RyanNeural': {
+        browserNames: ['Microsoft Ryan Online (Natural) - English (United Kingdom)', 'Microsoft Ryan - English (United Kingdom)', 'Ryan'],
+        fallbackPattern: /ryan.*uk|british.*male|uk.*male/i,
+        gender: 'male',
+        locale: 'en-GB',
+        description: 'Professional British Male'
+    },
+    
+    // Australian English
+    'en-AU-NatashaNeural': {
+        browserNames: ['Microsoft Natasha Online (Natural) - English (Australia)', 'Microsoft Natasha - English (Australia)', 'Natasha'],
+        fallbackPattern: /natasha|australian.*female|au.*female/i,
+        gender: 'female',
+        locale: 'en-AU',
+        description: 'Professional Australian Female'
+    },
+    'en-AU-WilliamNeural': {
+        browserNames: ['Microsoft William Online (Natural) - English (Australia)', 'Microsoft William - English (Australia)', 'William'],
+        fallbackPattern: /william.*au|australian.*male|au.*male/i,
+        gender: 'male',
+        locale: 'en-AU',
+        description: 'Professional Australian Male'
+    }
+};
+
+// Function to find the best available voice for a given Microsoft voice ID
+function findBestBrowserVoice(microsoftVoiceId) {
+    const voices = synthesis.getVoices();
+    const voiceInfo = voiceDatabase[microsoftVoiceId];
+    
+    if (!voiceInfo) {
+        console.log('No voice mapping found for:', microsoftVoiceId);
+        return null;
+    }
+    
+    // Try exact name matches first
+    for (const browserName of voiceInfo.browserNames) {
+        const exactMatch = voices.find(voice => voice.name === browserName);
+        if (exactMatch) {
+            console.log('Found exact voice match:', exactMatch.name);
+            return exactMatch;
+        }
+    }
+    
+    // Try pattern matching
+    const patternMatch = voices.find(voice => voiceInfo.fallbackPattern.test(voice.name));
+    if (patternMatch) {
+        console.log('Found pattern voice match:', patternMatch.name);
+        return patternMatch;
+    }
+    
+    // Try locale and gender matching
+    const localeGenderMatch = voices.find(voice => {
+        const voiceLang = voice.lang.toLowerCase();
+        const targetLang = voiceInfo.locale.toLowerCase();
+        const isLocaleMatch = voiceLang.includes(targetLang.split('-')[0]) || voiceLang === targetLang;
+        const isGenderMatch = voice.name.toLowerCase().includes(voiceInfo.gender);
+        return isLocaleMatch && isGenderMatch;
+    });
+    
+    if (localeGenderMatch) {
+        console.log('Found locale+gender voice match:', localeGenderMatch.name);
+        return localeGenderMatch;
+    }
+    
+    // Ultimate fallback - just match locale
+    const localeMatch = voices.find(voice => {
+        const voiceLang = voice.lang.toLowerCase();
+        const targetLang = voiceInfo.locale.toLowerCase();
+        return voiceLang.includes(targetLang.split('-')[0]) || voiceLang === targetLang;
+    });
+    
+    if (localeMatch) {
+        console.log('Found locale voice match:', localeMatch.name);
+        return localeMatch;
+    }
+    
+    console.log('No suitable voice found for:', microsoftVoiceId);
+    return null;
+}
         
         // ===== INITIALIZATION =====
         // This runs when the page loads
@@ -1730,26 +1938,46 @@ recognition.onend = function() {
         // Load available voices for text-to-speech
         
         function loadVoices() {
-            // Get available voices
-            const voices = synthesis.getVoices();
-            const voiceSelect = document.getElementById('voiceSelect');
-            
-            // Clear existing options
-            voiceSelect.innerHTML = '';
-            
-            // Add voice options
-            voices.forEach((voice, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${voice.name} (${voice.lang})`;
-                voiceSelect.appendChild(option);
-            });
-            
-            // Chrome loads voices asynchronously
-            if (voices.length === 0) {
-                synthesis.onvoiceschanged = loadVoices;
+    // Get available voices
+    const voices = synthesis.getVoices();
+    const voiceSelect = document.getElementById('voiceSelect');
+    const systemVoicesGroup = document.getElementById('systemVoicesGroup');
+    
+    if (!systemVoicesGroup) {
+        console.error('System voices group not found');
+        return;
+    }
+    
+    // Clear existing system voices
+    systemVoicesGroup.innerHTML = '';
+    
+    console.log('Loading voices, found:', voices.length);
+    
+    // Add system voices to the system voices optgroup
+    voices.forEach((voice, index) => {
+        const option = document.createElement('option');
+        option.value = voice.name; // Use voice name instead of index
+        option.textContent = `${voice.name} (${voice.lang})`;
+        option.setAttribute('data-voice-index', index); // Store index for reference
+        systemVoicesGroup.appendChild(option);
+    });
+    
+    // Chrome loads voices asynchronously
+    if (voices.length === 0) {
+        synthesis.onvoiceschanged = loadVoices;
+    } else {
+        console.log('Voices loaded successfully:', voices.length);
+        
+        // Try to restore saved voice selection
+        const saved = localStorage.getItem('pharmacyChatConfig');
+        if (saved) {
+            const config = JSON.parse(saved);
+            if (config.selectedVoice) {
+                voiceSelect.value = config.selectedVoice;
             }
         }
+    }
+}
         
         // ===== EVENT LISTENERS =====
         // Set up various UI interactions
@@ -2497,6 +2725,54 @@ function setButtonPending(buttonId, pendingText = null) {
             // Add initial message
             addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
         }
+
+        // Function to apply voice from scenario data
+function updateVoiceFromScenario() {
+    if (!currentScenario) return;
+    
+    // Check for voice selection in various possible column names
+    const scenarioVoice = currentScenario['Voice'] || 
+                         currentScenario['Voice Selection'] || 
+                         currentScenario['TTS Voice'] || 
+                         currentScenario['Voice ID'] ||
+                         currentScenario['Browser Voice'];
+    
+    if (scenarioVoice && scenarioVoice.trim() !== '') {
+        console.log('Found voice selection in scenario:', scenarioVoice);
+        
+        const voiceSelect = document.getElementById('voiceSelect');
+        const trimmedVoice = scenarioVoice.trim();
+        
+        // Check if it's a Microsoft voice ID (like en-US-AriaNeural)
+        if (trimmedVoice.includes('-') && trimmedVoice.includes('Neural')) {
+            // Try to find corresponding browser voice
+            const browserVoice = findBestBrowserVoice(trimmedVoice);
+            if (browserVoice) {
+                voiceSelect.value = browserVoice.name;
+                console.log('Mapped Microsoft voice to browser voice:', trimmedVoice, '->', browserVoice.name);
+                showStatus(`Voice set: ${browserVoice.name}`, 'success');
+            } else {
+                console.warn('Could not find browser voice for Microsoft voice:', trimmedVoice);
+                showStatus(`Voice "${trimmedVoice}" not available on this system`, 'warning');
+            }
+        } else {
+            // Direct browser voice name
+            const voices = synthesis.getVoices();
+            const directMatch = voices.find(voice => voice.name === trimmedVoice);
+            if (directMatch) {
+                voiceSelect.value = trimmedVoice;
+                console.log('Direct voice match found:', trimmedVoice);
+                showStatus(`Voice set: ${trimmedVoice}`, 'success');
+            } else {
+                console.warn('Direct voice not found:', trimmedVoice);
+                showStatus(`Voice "${trimmedVoice}" not available on this system`, 'warning');
+            }
+        }
+        
+        // Save the configuration
+        saveConfig();
+    }
+}
         
         // Update patient image button state based on scenario
 function updatePatientImageButton() {
@@ -3328,56 +3604,104 @@ if (!submitWebhookUrl) {
         }
         
         function speakWithBrowser(text) {
-            console.log('Speaking with browser TTS:', text);
-            
-            // Cancel any ongoing speech
-            synthesis.cancel();
-            
-            // Stop any ElevenLabs audio
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
+    console.log('Speaking with browser TTS:', text);
+    
+    // Cancel any ongoing speech
+    synthesis.cancel();
+    
+    // Stop any ElevenLabs audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    
+    // Check if speech synthesis is available
+    if (!synthesis) {
+        console.error('Speech synthesis not available');
+        return;
+    }
+    
+    // Create utterance
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Set voice with enhanced selection logic
+    const voiceSelect = document.getElementById('voiceSelect');
+    const voices = synthesis.getVoices();
+    let selectedVoice = null;
+    
+    console.log('Available voices:', voices.length);
+    console.log('Selected voice value:', voiceSelect.value);
+    
+    if (voiceSelect.value && voiceSelect.value !== "") {
+        // Try to find voice by name (preferred method)
+        selectedVoice = voices.find(voice => voice.name === voiceSelect.value);
+        
+        if (!selectedVoice) {
+            // Fallback: try to find by index (legacy method)
+            const voiceIndex = parseInt(voiceSelect.value);
+            if (!isNaN(voiceIndex) && voices[voiceIndex]) {
+                selectedVoice = voices[voiceIndex];
             }
-            
-            // Check if speech synthesis is available
-            if (!synthesis) {
-                console.error('Speech synthesis not available');
-                return;
-            }
-            
-            // Create utterance
-            const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Set voice
-            const voiceSelect = document.getElementById('voiceSelect');
-            const voices = synthesis.getVoices();
-            console.log('Available voices:', voices.length);
-            
-            if (voiceSelect.value && voices[voiceSelect.value]) {
-                utterance.voice = voices[voiceSelect.value];
-                console.log('Using voice:', voices[voiceSelect.value].name);
-            }
-            
-            // Set rate
-            utterance.rate = parseFloat(document.getElementById('speechRate').value);
-            console.log('Speech rate:', utterance.rate);
-            
-            // Add event listeners for debugging
-            utterance.onstart = function() {
-                console.log('Browser speech started');
-            };
-            
-            utterance.onend = function() {
-                console.log('Browser speech ended');
-            };
-            
-            utterance.onerror = function(event) {
-                console.error('Browser speech error:', event);
-            };
-            
-            // Speak
-            synthesis.speak(utterance);
         }
+        
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            console.log('Using selected voice:', selectedVoice.name);
+        } else {
+            console.warn('Selected voice not found, using default');
+        }
+    } else {
+        // Auto-select best available voice
+        selectedVoice = autoSelectBestVoice(voices);
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            console.log('Auto-selected voice:', selectedVoice.name);
+        }
+    }
+    
+    // Set rate
+    utterance.rate = parseFloat(document.getElementById('speechRate').value);
+    console.log('Speech rate:', utterance.rate);
+    
+    // Add event listeners for debugging
+    utterance.onstart = function() {
+        console.log('Browser speech started');
+    };
+    
+    utterance.onend = function() {
+        console.log('Browser speech ended');
+    };
+    
+    utterance.onerror = function(event) {
+        console.error('Browser speech error:', event);
+    };
+    
+    // Speak
+    synthesis.speak(utterance);
+}
+
+// Helper function to auto-select the best available voice
+function autoSelectBestVoice(voices) {
+    // Preference order: Neural voices > Standard voices
+    const preferences = [
+        /neural|online.*natural/i,
+        /aria|jenny|davis|guy/i,
+        /microsoft/i,
+        /en.*us|english.*united.*states/i,
+        /female|male/i
+    ];
+    
+    for (const pattern of preferences) {
+        const match = voices.find(voice => pattern.test(voice.name));
+        if (match) {
+            return match;
+        }
+    }
+    
+    // Ultimate fallback - first English voice
+    const englishVoice = voices.find(voice => voice.lang.toLowerCase().includes('en'));
+    return englishVoice || voices[0] || null;
+}
         
         // ===== CHAT MANAGEMENT =====
         // Handle chat display and messages
@@ -3473,6 +3797,7 @@ if (!submitWebhookUrl) {
         selectedChatbot: document.getElementById('chatbotSelect').value,
         scenarioSetsId: document.getElementById('scenarioSetsId').value,
         selectedScenarioSet: document.getElementById('scenarioSetSelect').value,
+        selectedVoice: document.getElementById('voiceSelect').value,
     };
     localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
 }
@@ -3488,6 +3813,10 @@ if (!submitWebhookUrl) {
                 // ADD THESE NEW LINES after the existing config loading:
                 document.getElementById('configSheetId').value = config.configSheetId || '';
                 document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
+
+                if (config.selectedVoice) {
+                document.getElementById('voiceSelect').value = config.selectedVoice;
+                }
                 
                 // Restore saved chatbot selection if configurations are already loaded
                 if (config.selectedChatbot && chatbotConfigurations.length > 0) {
@@ -3532,6 +3861,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
