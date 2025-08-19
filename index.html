@@ -2724,7 +2724,9 @@ function setButtonPending(buttonId, pendingText = null) {
             
             // Add initial message
             addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
-        }
+            // Update voice from scenario
+            updateVoiceFromScenario();
+            }
 
         // Function to apply voice from scenario data
 function updateVoiceFromScenario() {
@@ -3861,6 +3863,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
