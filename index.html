@@ -2549,6 +2549,33 @@ function updatePatientImageButton() {
         button.disabled = true;
     }
 }
+
+        // Show patient image modal with gallery functionality
+        function showPatientImage() {
+            if (!currentScenario || patientImages.length === 0) {
+                showStatus('No scenario selected or no images available', 'error');
+                return;
+            }
+            
+            // Reset to first image
+            currentImageIndex = 0;
+            
+            // Set modal title
+            const patientName = currentScenario['Patient Name'] || 'Patient';
+            const titleElement = document.getElementById('imageModalTitle');
+            if (patientImages.length === 1) {
+                titleElement.textContent = `${patientName} - Patient Image`;
+            } else {
+                titleElement.textContent = `${patientName} - Image 1 of ${patientImages.length}`;
+            }
+            
+            // Show modal
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('show');
+            
+            // Load the first image
+            loadImageAtIndex(0);
+        }
         
         // Helper function to convert Google Drive share links to direct image URLs
         function convertGoogleDriveUrl(url) {
@@ -3505,6 +3532,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
