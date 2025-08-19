@@ -664,23 +664,6 @@
             Load Chatbot Configurations
         </button>
         
-        <div class="form-group" style="margin-top: 15px;">
-            <label for="chatbotSelect">Select Chatbot:</label>
-            <select id="chatbotSelect" disabled style="font-size: 14px;">
-                <option value="">Load configurations first...</option>
-            </select>
-        </div>
-        
-        <button 
-            class="btn-info btn-status-pending" 
-            onclick="applyChatbotConfiguration()" 
-            style="width: 100%; font-size: 14px; margin-top: 10px;"
-            disabled
-            id="applyChatbotBtn"
-        >
-            Apply Selected Chatbot
-        </button>
-    </div>
     
     <!-- Hidden webhook fields - populated by chatbot configuration -->
     <input type="hidden" id="webhookUrl" />
@@ -706,53 +689,7 @@
             Load Scenario Sets
         </button>
         
-        <div class="form-group" style="margin-top: 15px;">
-            <label for="scenarioSetSelect">Select Scenario Set:</label>
-            <select id="scenarioSetSelect" disabled style="font-size: 14px;">
-                <option value="">Load scenario sets first...</option>
-            </select>
-        </div>
-        
-        <!-- Hidden field - automatically populated from scenario set selection -->
-        <input type="hidden" id="sheetId">
-    </div>
-    
-    <!-- Google Sheets configuration - MODIFIED -->
-    <div class="form-group">
-        <label for="sheetName">Sheet Name:</label>
-        <select id="sheetName" disabled>
-            <option value="">Select scenario set first</option>
-        </select>
-    </div>
-    
-    <!-- Scenario selection dropdown -->
-    <div class="form-group" style="margin-top: 20px;">
-        <label for="scenarioSelect">Select Scenario:</label>
-        <select id="scenarioSelect" disabled>
-            <option value="">Load sheet data first...</option>
-        </select>
-    </div>
-    
-    <button class="btn-secondary" onclick="selectRandomScenario()" style="margin-top: 10px;">
-        🎲 Random Scenario
-    </button>
-    
-    <!-- Patient Image Button -->
-    <button 
-        class="patient-image-btn disabled" 
-        id="patientImageBtn"
-        onclick="showPatientImage()"
-        disabled
-    >
-        📷 No Scenario Selected
-    </button>
-</div>
-            
-            <!-- Voice control section -->
-            <div class="card">
-                <h2>🎙️ Voice Control</h2>
-                
-                <!-- TTS Provider Selection -->
+<!-- TTS Provider Selection -->
                 <div class="form-group">
                     <label>Text-to-Speech Provider:</label>
                     <div class="tts-provider-group">
@@ -888,6 +825,71 @@
     </div>
 </div>
             </div>
+                
+</div>
+            
+            <!-- Voice control section -->
+            <div class="card">
+                <h2>🎙️ Voice Control</h2>
+
+                <div class="form-group" style="margin-top: 15px;">
+            <label for="chatbotSelect">Select Chatbot:</label>
+            <select id="chatbotSelect" disabled style="font-size: 14px;">
+                <option value="">Load configurations first...</option>
+            </select>
+        </div>
+        
+        <button 
+            class="btn-info btn-status-pending" 
+            onclick="applyChatbotConfiguration()" 
+            style="width: 100%; font-size: 14px; margin-top: 10px;"
+            disabled
+            id="applyChatbotBtn"
+        >
+            Apply Selected Chatbot
+        </button>
+    </div>
+                
+             <div class="form-group" style="margin-top: 15px;">
+            <label for="scenarioSetSelect">Select Scenario Set:</label>
+            <select id="scenarioSetSelect" disabled style="font-size: 14px;">
+                <option value="">Load scenario sets first...</option>
+            </select>
+        </div>
+        
+        <!-- Hidden field - automatically populated from scenario set selection -->
+        <input type="hidden" id="sheetId">
+    </div>
+    
+    <!-- Google Sheets configuration - MODIFIED -->
+    <div class="form-group">
+        <label for="sheetName">Sheet Name:</label>
+        <select id="sheetName" disabled>
+            <option value="">Select scenario set first</option>
+        </select>
+    </div>
+    
+    <!-- Scenario selection dropdown -->
+    <div class="form-group" style="margin-top: 20px;">
+        <label for="scenarioSelect">Select Scenario:</label>
+        <select id="scenarioSelect" disabled>
+            <option value="">Load sheet data first...</option>
+        </select>
+    </div>
+    
+    <button class="btn-secondary" onclick="selectRandomScenario()" style="margin-top: 10px;">
+        🎲 Random Scenario
+    </button>
+    
+    <!-- Patient Image Button -->
+    <button 
+        class="patient-image-btn disabled" 
+        id="patientImageBtn"
+        onclick="showPatientImage()"
+        disabled
+    >
+        📷 No Scenario Selected
+    </button>   
             
             <!-- Chat display area -->
             <div class="card">
@@ -3298,6 +3300,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
