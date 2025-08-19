@@ -902,7 +902,7 @@
                         >
                         <span id="rateValue">1.0</span>
                     </div>
-                </div>
+                </div> <!-- Add this closing div for browserTtsSettings -->
                 
                 <!-- ElevenLabs TTS Settings -->
                 <div id="elevenlabsSettings" class="tts-settings elevenlabs-config" style="display: none;">
@@ -1331,20 +1331,14 @@ function findBestBrowserVoice(microsoftVoiceId) {
             
             // Set up event listeners
             setupEventListeners();
-                        // ADD THESE NEW LINES in setupEventListeners():
-            document.getElementById('configSheetId').addEventListener('change', saveConfig);
-            document.getElementById('scenarioSetsId').addEventListener('change', saveConfig);
-            
+                
             // Load saved configuration from localStorage
             loadSavedConfig();
             
             // Display session info
             displaySessionInfo();
 
-            // Add this to setupEventListeners function:
-          document.getElementById('deepgramApiKey').addEventListener('change', saveConfig);
-          document.getElementById('deepgramModel').addEventListener('change', saveConfig);
-          document.getElementById('deepgramLanguage').addEventListener('change', saveConfig);
+           
         };
         
         // ===== SESSION MANAGEMENT =====
@@ -3833,56 +3827,56 @@ function autoSelectBestVoice(voices) {
         document.getElementById('configSheetId').value = config.configSheetId || '';
         document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
 
-        // ADD THIS VOICE SELECTION LOADING:
+        // Load voice selection
         if (config.selectedVoice) {
             document.getElementById('voiceSelect').value = config.selectedVoice;
         }
         
-       
-                
-                // Restore saved chatbot selection if configurations are already loaded
-                if (config.selectedChatbot && chatbotConfigurations.length > 0) {
-                    document.getElementById('chatbotSelect').value = config.selectedChatbot;
-                }
-                
-                // Try to set sheet name in dropdown first
-                const sheetNameDropdown = document.getElementById('sheetName');
-                if (config.sheetName) {
-                    // If dropdown has options, try to select the saved value
-                    if (sheetNameDropdown.options.length > 1) {
-                        sheetNameDropdown.value = config.sheetName;
-                    }
-                }
-                
-                // Set TTS provider
-                if (config.ttsProvider) {
-                    selectTtsProvider(config.ttsProvider);
-                }
-
-                if (config.sttProvider) {
-    selectSttProvider(config.sttProvider);
-}
-
-// Set Deepgram settings
-if (config.deepgramApiKey) {
-    document.getElementById('deepgramApiKey').value = config.deepgramApiKey;
-}
-if (config.deepgramModel) {
-    document.getElementById('deepgramModel').value = config.deepgramModel;
-}
-if (config.deepgramLanguage) {
-    document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
-}
-                
-                // Set ElevenLabs voice if saved
-                if (config.elevenlabsVoice) {
-                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoice;
-                }
+        // Restore saved chatbot selection if configurations are already loaded
+        if (config.selectedChatbot && chatbotConfigurations.length > 0) {
+            document.getElementById('chatbotSelect').value = config.selectedChatbot;
+        }
+        
+        // Try to set sheet name in dropdown first
+        const sheetNameDropdown = document.getElementById('sheetName');
+        if (config.sheetName) {
+            // If dropdown has options, try to select the saved value
+            if (sheetNameDropdown.options.length > 1) {
+                sheetNameDropdown.value = config.sheetName;
             }
         }
+        
+        // Set TTS provider
+        if (config.ttsProvider) {
+            selectTtsProvider(config.ttsProvider);
+        }
+
+        // Set STT provider
+        if (config.sttProvider) {
+            selectSttProvider(config.sttProvider);
+        }
+
+        // Set Deepgram settings
+        if (config.deepgramApiKey) {
+            document.getElementById('deepgramApiKey').value = config.deepgramApiKey;
+        }
+        if (config.deepgramModel) {
+            document.getElementById('deepgramModel').value = config.deepgramModel;
+        }
+        if (config.deepgramLanguage) {
+            document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
+        }
+        
+        // Set ElevenLabs voice if saved
+        if (config.elevenlabsVoice) {
+            document.getElementById('elevenlabsVoice').value = config.elevenlabsVoice;
+        }
+    }
+}
     </script>
 </body>
 </html>
+
 
 
 
