@@ -803,10 +803,12 @@
                     </div>
                 </div>
                 
+             
                 <!-- Browser TTS Settings -->
-                <div class="form-group">
-    <label for="voiceSelect">Browser Voice:</label>
-    <select id="voiceSelect">
+<div id="browserTtsSettings" class="tts-settings">
+    <div class="form-group">
+        <label for="voiceSelect">Browser Voice:</label>
+        <select id="voiceSelect">
         <option value="">Auto-Select Best Available</option>
         
         <!-- US English Female Voices -->
@@ -1473,21 +1475,28 @@ function updateSessionInfo() {
         // Handle switching between browser and ElevenLabs TTS
         
         function selectTtsProvider(provider) {
-            currentTtsProvider = provider;
-            
-            // Update UI
-            document.getElementById('browserTtsBtn').classList.toggle('active', provider === 'browser');
-            document.getElementById('elevenlabsTtsBtn').classList.toggle('active', provider === 'elevenlabs');
-            
-            // Show/hide settings
-            document.getElementById('browserTtsSettings').style.display = provider === 'browser' ? 'block' : 'none';
-            document.getElementById('elevenlabsSettings').style.display = provider === 'elevenlabs' ? 'block' : 'none';
-            
-            // Save preference
-            saveConfig();
-            
-            console.log('TTS provider changed to:', provider);
-        }
+    currentTtsProvider = provider;
+    
+    // Update UI
+    document.getElementById('browserTtsBtn').classList.toggle('active', provider === 'browser');
+    document.getElementById('elevenlabsTtsBtn').classList.toggle('active', provider === 'elevenlabs');
+    
+    // Show/hide settings - FIXED
+    const browserSettings = document.getElementById('browserTtsSettings');
+    const elevenlabsSettings = document.getElementById('elevenlabsSettings');
+    
+    if (browserSettings) {
+        browserSettings.style.display = provider === 'browser' ? 'block' : 'none';
+    }
+    if (elevenlabsSettings) {
+        elevenlabsSettings.style.display = provider === 'elevenlabs' ? 'block' : 'none';
+    }
+    
+    // Save preference
+    saveConfig();
+    
+    console.log('TTS provider changed to:', provider);
+}
 
         // ===== STT PROVIDER MANAGEMENT =====
 function selectSttProvider(provider) {
@@ -1983,26 +1992,34 @@ recognition.onend = function() {
         // Set up various UI interactions
         
         function setupEventListeners() {
-            // Speech rate slider
-            document.getElementById('speechRate').addEventListener('input', function(e) {
-                document.getElementById('rateValue').textContent = e.target.value;
-            });
-            
-            // ElevenLabs sliders
-            document.getElementById('elevenlabsStability').addEventListener('input', function(e) {
-                document.getElementById('stabilityValue').textContent = e.target.value;
-            });
-            
-            document.getElementById('elevenlabsClarity').addEventListener('input', function(e) {
-                document.getElementById('clarityValue').textContent = e.target.value;
-            });
-            
-            // Save configuration when changed
-            document.getElementById('webhookUrl').addEventListener('change', saveConfig);
-            document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
-            document.getElementById('sheetId').addEventListener('change', saveConfig);
-            document.getElementById('elevenlabsApiKey').addEventListener('change', saveConfig);
-        }
+    // Speech rate slider
+    document.getElementById('speechRate').addEventListener('input', function(e) {
+        document.getElementById('rateValue').textContent = e.target.value;
+    });
+    
+    // ElevenLabs sliders
+    document.getElementById('elevenlabsStability').addEventListener('input', function(e) {
+        document.getElementById('stabilityValue').textContent = e.target.value;
+    });
+    
+    document.getElementById('elevenlabsClarity').addEventListener('input', function(e) {
+        document.getElementById('clarityValue').textContent = e.target.value;
+    });
+    
+    // Save configuration when changed
+    document.getElementById('webhookUrl').addEventListener('change', saveConfig);
+    document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
+    document.getElementById('sheetId').addEventListener('change', saveConfig);
+    document.getElementById('elevenlabsApiKey').addEventListener('change', saveConfig);
+    
+    // ADD THESE MISSING LINES:
+    document.getElementById('configSheetId').addEventListener('change', saveConfig);
+    document.getElementById('scenarioSetsId').addEventListener('change', saveConfig);
+    document.getElementById('deepgramApiKey').addEventListener('change', saveConfig);
+    document.getElementById('deepgramModel').addEventListener('change', saveConfig);
+    document.getElementById('deepgramLanguage').addEventListener('change', saveConfig);
+    document.getElementById('voiceSelect').addEventListener('change', saveConfig); // Add this line
+}
         
         // ===== NEW RECORDING FUNCTIONS =====
 // Toggle recording start/stop functionality
@@ -2702,31 +2719,32 @@ function setButtonPending(buttonId, pendingText = null) {
             }
         }
         
-        // Handle scenario selection
-        function selectScenario(rowIndex) {
-            const headers = sheetData[0];
-            const row = sheetData[rowIndex];
-            
-            // Create scenario object
-            currentScenario = {};
-            headers.forEach((header, index) => {
-                currentScenario[header] = row[index];
-            });
-            
-            console.log('Selected scenario:', currentScenario);
-            showStatus(`Scenario loaded: ${currentScenario['Patient Name']}`, 'success');
-            
-            // Update patient image button based on image availability
-            updatePatientImageButton();
-            
-            // Clear previous conversation
-            clearChat();
-            
-            // Add initial message
-            addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
-            // Update voice from scenario
-            updateVoiceFromScenario();
-            }
+       // Handle scenario selection
+function selectScenario(rowIndex) {
+    const headers = sheetData[0];
+    const row = sheetData[rowIndex];
+    
+    // Create scenario object
+    currentScenario = {};
+    headers.forEach((header, index) => {
+        currentScenario[header] = row[index];
+    });
+    
+    console.log('Selected scenario:', currentScenario);
+    showStatus(`Scenario loaded: ${currentScenario['Patient Name']}`, 'success');
+    
+    // Update patient image button based on image availability
+    updatePatientImageButton();
+    
+    // Clear previous conversation
+    clearChat();
+    
+    // Add initial message
+    addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
+    
+    // Update voice from scenario
+    updateVoiceFromScenario();
+}
 
         // Function to apply voice from scenario data
 function updateVoiceFromScenario() {
@@ -3805,20 +3823,22 @@ function autoSelectBestVoice(voices) {
 }
         
         function loadSavedConfig() {
-            const saved = localStorage.getItem('pharmacyChatConfig');
-            if (saved) {
-                const config = JSON.parse(saved);
-                document.getElementById('webhookUrl').value = config.webhookUrl || '';
-                document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl || '';
-                document.getElementById('sheetId').value = config.sheetId || '';
-                document.getElementById('elevenlabsApiKey').value = config.elevenlabsApiKey || '';
-                // ADD THESE NEW LINES after the existing config loading:
-                document.getElementById('configSheetId').value = config.configSheetId || '';
-                document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
+    const saved = localStorage.getItem('pharmacyChatConfig');
+    if (saved) {
+        const config = JSON.parse(saved);
+        document.getElementById('webhookUrl').value = config.webhookUrl || '';
+        document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl || '';
+        document.getElementById('sheetId').value = config.sheetId || '';
+        document.getElementById('elevenlabsApiKey').value = config.elevenlabsApiKey || '';
+        document.getElementById('configSheetId').value = config.configSheetId || '';
+        document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
 
-                if (config.selectedVoice) {
-                document.getElementById('voiceSelect').value = config.selectedVoice;
-                }
+        // ADD THIS VOICE SELECTION LOADING:
+        if (config.selectedVoice) {
+            document.getElementById('voiceSelect').value = config.selectedVoice;
+        }
+        
+       
                 
                 // Restore saved chatbot selection if configurations are already loaded
                 if (config.selectedChatbot && chatbotConfigurations.length > 0) {
@@ -3863,6 +3883,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
