@@ -3722,7 +3722,18 @@ if (!submitWebhookUrl) {
     selectSttProvider(config.sttProvider);
 }
 
-                // ===== COLLAPSIBLE PANELS =====
+// Set Deepgram settings
+if (config.deepgramApiKey) {
+    document.getElementById('deepgramApiKey').value = config.deepgramApiKey;
+}
+if (config.deepgramModel) {
+    document.getElementById('deepgramModel').value = config.deepgramModel;
+}
+if (config.deepgramLanguage) {
+    document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
+}
+
+// ===== COLLAPSIBLE PANELS =====
 let isConfigCollapsed = false;
 let isVoiceCollapsed = false;
 
@@ -3801,17 +3812,6 @@ function loadCollapsedState() {
         }, 150);
     }
 }
-
-// Set Deepgram settings
-if (config.deepgramApiKey) {
-    document.getElementById('deepgramApiKey').value = config.deepgramApiKey;
-}
-if (config.deepgramModel) {
-    document.getElementById('deepgramModel').value = config.deepgramModel;
-}
-if (config.deepgramLanguage) {
-    document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
-}
                 
                 // Set ElevenLabs voice if saved
                 if (config.elevenlabsVoice) {
@@ -3822,6 +3822,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
