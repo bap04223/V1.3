@@ -1493,6 +1493,10 @@ if (fullTranscript.trim()) {
                 });
                 
                 showStatus(`Loaded ${elevenlabsVoices.length} ElevenLabs voices`, 'success');
+            // Reapply scenario voice settings after ElevenLabs voices are loaded
+            if (currentScenario) {
+                applyScenarioVoiceSettings();
+            }
                 console.log('ElevenLabs voices loaded:', elevenlabsVoices);
                 
             } catch (error) {
@@ -1716,10 +1720,16 @@ recognition.onend = function() {
             });
             
             // Chrome loads voices asynchronously
-            if (voices.length === 0) {
-                synthesis.onvoiceschanged = loadVoices;
-            }
-        }
+    if (voices.length === 0) {
+        synthesis.onvoiceschanged = loadVoices;
+    }
+    
+    // ADD THIS NEW CODE:
+    // Reapply scenario voice settings after voices are loaded
+    if (currentScenario) {
+        applyScenarioVoiceSettings();
+    }
+}
         
         // ===== EVENT LISTENERS =====
         // Set up various UI interactions
@@ -2454,6 +2464,10 @@ function setButtonPending(buttonId, pendingText = null) {
             headers.forEach((header, index) => {
                 currentScenario[header] = row[index];
             });
+
+                    // ADD THIS NEW CODE BLOCK:
+            // Apply scenario-specific voice settings
+            applyScenarioVoiceSettings();
             
             console.log('Selected scenario:', currentScenario);
             showStatus(`Scenario loaded: ${currentScenario['Patient Name']}`, 'success');
@@ -2467,6 +2481,71 @@ function setButtonPending(buttonId, pendingText = null) {
             // Add initial message
             addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
         }
+            
+            console.log('Selected scenario:', currentScenario);
+            showStatus(`Scenario loaded: ${currentScenario['Patient Name']}`, 'success');
+            
+            // Update patient image button based on image availability
+            updatePatientImageButton();
+            
+            // Clear previous conversation
+            clearChat();
+            
+            // Add initial message
+            addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
+        }
+
+        // Apply voice settings from scenario data
+function applyScenarioVoiceSettings() {
+    if (!currentScenario) return;
+    
+    // Check for Browser TTS voice setting
+    const browserVoice = currentScenario['Browser TTS Voice'] || 
+                        currentScenario['Browser Voice'] || 
+                        currentScenario['TTS Voice Browser'];
+    
+    // Check for ElevenLabs voice setting
+    const elevenlabsVoice = currentScenario['ElevenLabs Voice'] || 
+                           currentScenario['ElevenLabs TTS Voice'] || 
+                           currentScenario['TTS Voice ElevenLabs'];
+    
+    // Apply browser TTS voice if specified
+    if (browserVoice && browserVoice.trim() !== '') {
+        const voiceSelect = document.getElementById('voiceSelect');
+        const voices = synthesis.getVoices();
+        
+        // Try to find matching voice by name (case-insensitive partial match)
+        for (let i = 0; i < voices.length; i++) {
+            if (voices[i].name.toLowerCase().includes(browserVoice.toLowerCase()) ||
+                browserVoice.toLowerCase().includes(voices[i].name.toLowerCase())) {
+                voiceSelect.value = i;
+                console.log(`Applied browser voice from scenario: ${voices[i].name}`);
+                showStatus(`Browser voice set to: ${voices[i].name}`, 'info');
+                break;
+            }
+        }
+    }
+    
+    // Apply ElevenLabs voice if specified and voices are loaded
+    if (elevenlabsVoice && elevenlabsVoice.trim() !== '' && elevenlabsVoices.length > 0) {
+        const elevenlabsSelect = document.getElementById('elevenlabsVoice');
+        
+        // Try to find matching voice by name or ID
+        for (let voice of elevenlabsVoices) {
+            if (voice.name.toLowerCase().includes(elevenlabsVoice.toLowerCase()) ||
+                voice.voice_id === elevenlabsVoice ||
+                elevenlabsVoice.toLowerCase().includes(voice.name.toLowerCase())) {
+                elevenlabsSelect.value = voice.voice_id;
+                console.log(`Applied ElevenLabs voice from scenario: ${voice.name}`);
+                showStatus(`ElevenLabs voice set to: ${voice.name}`, 'info');
+                break;
+            }
+        }
+    }
+    
+    // Save the updated configuration
+    saveConfig();
+}
         
         // Update patient image button state based on scenario
 function updatePatientImageButton() {
@@ -3443,6 +3522,8 @@ if (!submitWebhookUrl) {
         selectedChatbot: document.getElementById('chatbotSelect').value,
         scenarioSetsId: document.getElementById('scenarioSetsId').value,
         selectedScenarioSet: document.getElementById('scenarioSetSelect').value,
+         browserVoice: document.getElementById('voiceSelect').value,
+        elevenlabsVoiceSelection: document.getElementById('elevenlabsVoice').value,
     };
     localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
 }
@@ -3458,6 +3539,15 @@ if (!submitWebhookUrl) {
                 // ADD THESE NEW LINES after the existing config loading:
                 document.getElementById('configSheetId').value = config.configSheetId || '';
                 document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
+         
+                // ADD THIS NEW CODE:
+                // Restore voice selections
+                if (config.browserVoice) {
+                    document.getElementById('voiceSelect').value = config.browserVoice;
+                }
+                if (config.elevenlabsVoiceSelection) {
+                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoiceSelection;
+                }
                 
                 // Restore saved chatbot selection if configurations are already loaded
                 if (config.selectedChatbot && chatbotConfigurations.length > 0) {
@@ -3502,4 +3592,5 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
