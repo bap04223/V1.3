@@ -2482,19 +2482,6 @@ function setButtonPending(buttonId, pendingText = null) {
             addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
         }
             
-            console.log('Selected scenario:', currentScenario);
-            showStatus(`Scenario loaded: ${currentScenario['Patient Name']}`, 'success');
-            
-            // Update patient image button based on image availability
-            updatePatientImageButton();
-            
-            // Clear previous conversation
-            clearChat();
-            
-            // Add initial message
-            addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
-        }
-
         // Apply voice settings from scenario data
 function applyScenarioVoiceSettings() {
     if (!currentScenario) return;
@@ -3592,6 +3579,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
