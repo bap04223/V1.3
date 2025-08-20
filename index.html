@@ -816,10 +816,9 @@
                         <select id="elevenlabsVoice" disabled>
                             <option value="">Enter API key to load voices...</option>
                         </select>
-                        <button class="btn-danger" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;">
-                            🔄 Load Voices
-                        </button>
-                    </div>
+                       <button class="btn-danger" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;" id="loadVoicesBtn">
+    🔄 Load Voices
+</button>
                     
                     <div class="form-group">
                         <label for="elevenlabsStability">Voice Stability:</label>
@@ -1488,6 +1487,13 @@ if (fullTranscript.trim()) {
                 applyScenarioVoiceSettings();
             }
                 console.log('ElevenLabs voices loaded:', elevenlabsVoices);
+
+                // Update button to show success
+const loadBtn = document.getElementById('loadVoicesBtn');
+if (loadBtn) {
+    loadBtn.className = 'btn-success';
+    loadBtn.innerHTML = '✅ Voices Loaded';
+}
                 
             } catch (error) {
                 console.error('Error loading ElevenLabs voices:', error);
@@ -3567,6 +3573,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
