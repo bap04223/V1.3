@@ -3733,8 +3733,15 @@ if (config.deepgramModel) {
 if (config.deepgramLanguage) {
     document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
 }
+     
+                // Set ElevenLabs voice if saved
+                if (config.elevenlabsVoice) {
+                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoice;
+                }
+            }
+        }
 
-// ===== COLLAPSIBLE PANELS =====
+        // ===== COLLAPSIBLE PANELS =====
 let isConfigCollapsed = false;
 let isVoiceCollapsed = false;
 
@@ -3813,16 +3820,10 @@ function loadCollapsedState() {
         }, 150);
     }
 }
-                
-                // Set ElevenLabs voice if saved
-                if (config.elevenlabsVoice) {
-                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoice;
-                }
-            }
-        }
     </script>
 </body>
 </html>
+
 
 
 
