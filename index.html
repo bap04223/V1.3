@@ -194,6 +194,34 @@
         .btn-warning:hover {
             background-color: #d97706;
         }
+
+         .btn-warning:hover {
+            background-color: #d97706;
+        }
+        
+        /* ElevenLabs Load Voices button states */
+        .btn-voice-load-pending {
+            background-color: var(--danger-color) !important;
+            color: white !important;
+        }
+
+        .btn-voice-load-pending:hover {
+            background-color: #dc2626 !important;
+        }
+
+        .btn-voice-load-success {
+            background-color: var(--success-color) !important;
+            color: white !important;
+        }
+
+        .btn-voice-load-success:hover {
+            background-color: #047857 !important;
+        }
+
+        .btn-voice-load-success::after {
+            content: " ✓";
+            font-weight: bold;
+        }
         
         
 /* Review section styling */
@@ -816,7 +844,7 @@
                         <select id="elevenlabsVoice" disabled>
                             <option value="">Enter API key to load voices...</option>
                         </select>
-                        <button class="btn-warning" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;">
+                        <button class="btn-voice-load-pending" id="loadVoicesBtn" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;">
                             🔄 Load Voices
                         </button>
                     </div>
@@ -1440,11 +1468,17 @@ if (fullTranscript.trim()) {
         
         async function loadElevenLabsVoices() {
             const apiKey = document.getElementById('elevenlabsApiKey').value;
+            const loadBtn = document.getElementById('loadVoicesBtn');
             
             if (!apiKey) {
                 showStatus('Please enter your ElevenLabs API key first', 'error');
                 return;
             }
+            
+            // Set button to loading state
+            loadBtn.disabled = true;
+            loadBtn.innerHTML = '⏳ Loading...';
+            loadBtn.className = 'btn-voice-load-pending';
             
             showStatus('Loading ElevenLabs voices...', 'info');
             
@@ -1482,108 +1516,52 @@ if (fullTranscript.trim()) {
                     voiceSelect.appendChild(option);
                 });
                 
+                // Set button to success state
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = 'Voices Loaded';
+                loadBtn.className = 'btn-voice-load-success';
+                
                 showStatus(`Loaded ${elevenlabsVoices.length} ElevenLabs voices`, 'success');
-            // Reapply scenario voice settings after ElevenLabs voices are loaded
-            if (currentScenario) {
-                applyScenarioVoiceSettings();
-            }
+                
+                // Reapply scenario voice settings after ElevenLabs voices are loaded
+                if (currentScenario) {
+                    applyScenarioVoiceSettings();
+                }
+                
                 console.log('ElevenLabs voices loaded:', elevenlabsVoices);
                 
             } catch (error) {
                 console.error('Error loading ElevenLabs voices:', error);
+                
+                // Set button back to pending state on error
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = 'Load Failed - Retry';
+                loadBtn.className = 'btn-voice-load-pending';
+                
                 showStatus(`Error loading voices: ${error.message}`, 'error');
             }
         }
-        
-        function previewElevenLabsVoice() {
-            const sampleText = "Hello, I'm here to help you with your pharmacy consultation. How can I assist you today?";
-            speakWithElevenLabs(sampleText);
-        }
-        
-        async function speakWithElevenLabs(text) {
-            const apiKey = document.getElementById('elevenlabsApiKey').value;
-            const voiceId = document.getElementById('elevenlabsVoice').value;
-            const stability = parseFloat(document.getElementById('elevenlabsStability').value);
-            const clarity = parseFloat(document.getElementById('elevenlabsClarity').value);
-            
-            if (!apiKey) {
-                showStatus('ElevenLabs API key not configured', 'error');
-                return;
-            }
-            
-            if (!voiceId) {
-                showStatus('Please select an ElevenLabs voice', 'error');
-                return;
-            }
-            
-            try {
-                // Stop any currently playing audio
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio = null;
-                }
-                
-                console.log('Generating speech with ElevenLabs...', {
-                    voiceId,
-                    stability,
-                    clarity,
-                    textLength: text.length
-                });
-                
-                const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-                    method: 'POST',
-                    headers: {
-                        'xi-api-key': apiKey,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        text: text,
-                        model_id: "eleven_monolingual_v1",
-                        voice_settings: {
-                            stability: stability,
-                            similarity_boost: clarity
-                        }
-                    })
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('Invalid API key');
-                    } else if (response.status === 429) {
-                        throw new Error('Rate limit exceeded');
-                    } else if (response.status === 422) {
-                        throw new Error('Text too long or invalid parameters');
-                    } else {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                }
-                
-                // Get audio blob
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                
-                // Create and play audio
-                currentAudio = new Audio(audioUrl);
-                currentAudio.play();
-                
-                // Clean up URL when audio ends
-                currentAudio.addEventListener('ended', () => {
-                    URL.revokeObjectURL(audioUrl);
-                });
-                
-                console.log('ElevenLabs speech generated and playing');
-                
-            } catch (error) {
-                console.error('ElevenLabs TTS error:', error);
-                showStatus(`ElevenLabs error: ${error.message}`, 'error');
-                
-                // Fallback to browser TTS
-                console.log('Falling back to browser TTS');
-                speakWithBrowser(text);
-            }
 
+        // Reset ElevenLabs button state when API key changes
+        function resetElevenLabsButtonState() {
+            const loadBtn = document.getElementById('loadVoicesBtn');
+            const apiKey = document.getElementById('elevenlabsApiKey').value;
+            
+            if (loadBtn) {
+                if (apiKey && apiKey.trim() !== '') {
+                    // API key present - set to pending state
+                    loadBtn.className = 'btn-voice-load-pending';
+                    loadBtn.innerHTML = '🔄 Load Voices';
+                    loadBtn.disabled = false;
+                } else {
+                    // No API key - keep red but disabled
+                    loadBtn.className = 'btn-voice-load-pending';
+                    loadBtn.innerHTML = '🔄 Load Voices';
+                    loadBtn.disabled = true;
+                }
+            }
         }
-        
+             
         function previewElevenLabsVoice() {
             const sampleText = "Hello, I'm here to help you with your pharmacy consultation. How can I assist you today?";
             speakWithElevenLabs(sampleText);
@@ -1744,6 +1722,7 @@ recognition.onend = function() {
             document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
             document.getElementById('sheetId').addEventListener('change', saveConfig);
             document.getElementById('elevenlabsApiKey').addEventListener('change', saveConfig);
+            document.getElementById('elevenlabsApiKey').addEventListener('input', resetElevenLabsButtonState);
         }
         
         // ===== NEW RECORDING FUNCTIONS =====
@@ -3567,6 +3546,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
