@@ -1316,10 +1316,11 @@
           document.getElementById('deepgramApiKey').addEventListener('change', saveConfig);
           document.getElementById('deepgramModel').addEventListener('change', saveConfig);
           document.getElementById('deepgramLanguage').addEventListener('change', saveConfig);
+       // Load collapsed state for panels
+            loadCollapsedState();
         };
 
-            // Load collapsed state for panels
-            loadCollapsedState();
+            
         
         // ===== SESSION MANAGEMENT =====
         // Generate and manage unique session IDs
@@ -3822,6 +3823,7 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
+
 
 
 
