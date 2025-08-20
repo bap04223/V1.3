@@ -3578,6 +3578,99 @@ if (!submitWebhookUrl) {
             // Speak
             synthesis.speak(utterance);
         }
+
+        async function speakWithElevenLabs(text) {
+    console.log('Speaking with ElevenLabs TTS:', text);
+    
+    const apiKey = document.getElementById('elevenlabsApiKey').value;
+    const voiceId = document.getElementById('elevenlabsVoice').value;
+    
+    if (!apiKey) {
+        console.error('ElevenLabs API key not provided');
+        showStatus('Please enter your ElevenLabs API key', 'error');
+        return;
+    }
+    
+    if (!voiceId) {
+        console.error('ElevenLabs voice not selected');
+        showStatus('Please select an ElevenLabs voice', 'error');
+        return;
+    }
+    
+    // Stop any currently playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    synthesis.cancel();
+    
+    try {
+        const stability = parseFloat(document.getElementById('elevenlabsStability').value);
+        const clarity = parseFloat(document.getElementById('elevenlabsClarity').value);
+        
+        console.log('Using ElevenLabs voice:', voiceId, 'Stability:', stability, 'Clarity:', clarity);
+        
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'audio/mpeg',
+                'Content-Type': 'application/json',
+                'xi-api-key': apiKey
+            },
+            body: JSON.stringify({
+                text: text,
+                model_id: 'eleven_monolingual_v1',
+                voice_settings: {
+                    stability: stability,
+                    similarity_boost: clarity,
+                    style: 0.0,
+                    use_speaker_boost: true
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Invalid ElevenLabs API key');
+            } else if (response.status === 429) {
+                throw new Error('ElevenLabs rate limit exceeded');
+            } else {
+                throw new Error(`ElevenLabs API error: ${response.status}`);
+            }
+        }
+        
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        currentAudio = new Audio(audioUrl);
+        
+        currentAudio.onplay = function() {
+            console.log('ElevenLabs audio started playing');
+        };
+        
+        currentAudio.onended = function() {
+            console.log('ElevenLabs audio finished playing');
+            URL.revokeObjectURL(audioUrl);
+            currentAudio = null;
+        };
+        
+        currentAudio.onerror = function(error) {
+            console.error('ElevenLabs audio playback error:', error);
+            URL.revokeObjectURL(audioUrl);
+            currentAudio = null;
+        };
+        
+        await currentAudio.play();
+        
+    } catch (error) {
+        console.error('ElevenLabs TTS error:', error);
+        showStatus(`ElevenLabs error: ${error.message}`, 'error');
+        
+        // Fallback to browser TTS
+        console.log('Falling back to browser TTS');
+        speakWithBrowser(text);
+    }
+}
         
         // ===== CHAT MANAGEMENT =====
         // Handle chat display and messages
@@ -3823,6 +3916,7 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
+
 
 
 
