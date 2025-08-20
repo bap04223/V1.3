@@ -2085,13 +2085,13 @@ function populateChatbotDropdown() {
         select.appendChild(option);
     });
     
-      
     select.addEventListener('change', function() {
-    if (this.value !== '') {
-        // Automatically apply the selected configuration
-        applyChatbotConfiguration();
-    }
-});
+        if (this.value !== '') {
+            // Automatically apply the selected configuration
+            applyChatbotConfiguration();
+        }
+    });
+} 
 }
 
 // Apply the selected chatbot configuration
@@ -3569,6 +3569,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
