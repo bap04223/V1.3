@@ -2091,7 +2091,6 @@ function populateChatbotDropdown() {
             applyChatbotConfiguration();
         }
     });
-} 
 }
 
 // Apply the selected chatbot configuration
@@ -2114,11 +2113,11 @@ function applyChatbotConfiguration() {
     
     showStatus(`✅ Applied configuration: ${config.name}`, 'success');
     // Update the dropdown to show applied status
-const selectElement = document.getElementById('chatbotSelect');
-if (selectElement) {
-    selectElement.style.borderColor = 'var(--success-color)';
-    selectElement.style.backgroundColor = '#f0f9ff';
-}
+    const selectElement2 = document.getElementById('chatbotSelect');
+    if (selectElement2) {
+        selectElement2.style.borderColor = 'var(--success-color)';
+        selectElement2.style.backgroundColor = '#f0f9ff';
+    }
     
     if (conversationHistory.length > 0) {
         const shouldClear = confirm('Apply new chatbot configuration? This will clear the current conversation.');
@@ -3569,6 +3568,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
