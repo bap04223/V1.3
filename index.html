@@ -908,16 +908,6 @@
                 <option value="">Load configurations first...</option>
             </select>
         </div>
-        
-        <button 
-            class="btn-info btn-status-pending" 
-            onclick="applyChatbotConfiguration()" 
-            style="width: 100%; font-size: 14px; margin-top: 10px;"
-            disabled
-            id="applyChatbotBtn"
-        >
-            Apply Selected Chatbot
-        </button>
    
                 
              <div class="form-group" style="margin-top: 15px;">
@@ -2095,18 +2085,13 @@ function populateChatbotDropdown() {
         select.appendChild(option);
     });
     
-    document.getElementById('applyChatbotBtn').disabled = false;
-    
+      
     select.addEventListener('change', function() {
-        const applyBtn = document.getElementById('applyChatbotBtn');
-        if (this.value !== '') {
-            applyBtn.disabled = false;
-            applyBtn.textContent = `✅ Apply ${chatbotConfigurations[this.value].name}`;
-        } else {
-            applyBtn.disabled = true;
-            applyBtn.textContent = '✅ Apply Selected Configuration';
-        }
-    });
+    if (this.value !== '') {
+        // Automatically apply the selected configuration
+        applyChatbotConfiguration();
+    }
+});
 }
 
 // Apply the selected chatbot configuration
@@ -2128,7 +2113,12 @@ function applyChatbotConfiguration() {
     saveConfig();
     
     showStatus(`✅ Applied configuration: ${config.name}`, 'success');
-    setButtonCompleted('applyChatbotBtn', `Applied: ${config.name}`);
+    // Update the dropdown to show applied status
+const selectElement = document.getElementById('chatbotSelect');
+if (selectElement) {
+    selectElement.style.borderColor = 'var(--success-color)';
+    selectElement.style.backgroundColor = '#f0f9ff';
+}
     
     if (conversationHistory.length > 0) {
         const shouldClear = confirm('Apply new chatbot configuration? This will clear the current conversation.');
@@ -3579,6 +3569,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
