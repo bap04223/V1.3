@@ -816,9 +816,10 @@
                         <select id="elevenlabsVoice" disabled>
                             <option value="">Enter API key to load voices...</option>
                         </select>
-                       <button class="btn-danger" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;" id="loadVoicesBtn">
-    🔄 Load Voices
-</button>
+                        <button class="btn-warning" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;">
+                            🔄 Load Voices
+                        </button>
+                    </div>
                     
                     <div class="form-group">
                         <label for="elevenlabsStability">Voice Stability:</label>
@@ -892,12 +893,14 @@
             <option value="en-GB">English (UK)</option>
             <option value="en-AU">English (AU)</option>
         </select>
-        </div>
     </div>
+</div>
+</div>
+
             
-            <!-- Scenario managment section -->
+            <!-- Voice control section -->
             <div class="card">
-                <h2>Scenario Managment</h2>
+                <h2>🎙️ Voice Control</h2>
 
                 <div class="form-group" style="margin-top: 15px;">
             <label for="chatbotSelect">Select Chatbot:</label>
@@ -947,7 +950,6 @@
             >
                 📷 No Scenario Selected
             </button>   
-</div>
 </div>
             
             <!-- Chat display area -->
@@ -1486,13 +1488,6 @@ if (fullTranscript.trim()) {
                 applyScenarioVoiceSettings();
             }
                 console.log('ElevenLabs voices loaded:', elevenlabsVoices);
-
-                // Update button to show success
-const loadBtn = document.getElementById('loadVoicesBtn');
-if (loadBtn) {
-    loadBtn.className = 'btn-success';
-    loadBtn.innerHTML = '✅ Voices Loaded';
-}
                 
             } catch (error) {
                 console.error('Error loading ElevenLabs voices:', error);
@@ -3572,6 +3567,16 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
 
