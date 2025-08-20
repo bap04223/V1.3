@@ -3523,7 +3523,7 @@ if (!submitWebhookUrl) {
         scenarioSetsId: document.getElementById('scenarioSetsId').value,
         selectedScenarioSet: document.getElementById('scenarioSetSelect').value,
          browserVoice: document.getElementById('voiceSelect').value,
-        elevenlabsVoiceSelection: document.getElementById('elevenlabsVoice').value,
+        elevenlabsVoiceSelection: document.getElementById('elevenlabsVoice').value
     };
     localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
 }
@@ -3592,5 +3592,6 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
