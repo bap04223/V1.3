@@ -1618,7 +1618,7 @@ async function startDeepgramRecording() {
         };
         
         // Start recording with 100ms chunks
-        mediaRecorder.start(100);
+        mediaRecorder.start(200);
         console.log('Deepgram recording started');
         
         return true;
@@ -1657,7 +1657,7 @@ if (fullTranscript.trim()) {
     // The timeout in stopRecording() will call showReviewSection()
     // Do NOT call addMessage or sendToWebhook here
 }
-    }, 500);
+    }, 1500);
 }
         
         // ===== ELEVENLABS INTEGRATION =====
@@ -3916,6 +3916,7 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
+
 
 
 
