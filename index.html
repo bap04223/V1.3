@@ -2107,13 +2107,16 @@ function showReviewSection(transcript) {
     document.getElementById('editBtn').disabled = false;
     document.getElementById('deleteBtn').disabled = false;
     
+    // Show keyboard shortcuts hint
+    showKeyboardHints();
+    
     // Scroll to review section
     document.getElementById('reviewSection').scrollIntoView({ 
         behavior: 'smooth', 
         block: 'center' 
     });
     
-    showStatus('Review your message above. Edit if needed, then click "Send Message"', 'info');
+    showStatus('Review your message above. Edit if needed, then click "Send Message" or press ENTER', 'info');
 }
 
 function sendReviewedMessage() {
@@ -2171,6 +2174,12 @@ document.getElementById('reviewTranscript').textContent = 'No message to review 
 function hideReviewSection() {
     document.getElementById('reviewSection').classList.remove('active');
     document.getElementById('reviewTranscript').textContent = 'No message to review yet';
+    
+    // Remove keyboard hints if they exist
+    const hintsDiv = document.querySelector('.keyboard-hints');
+    if (hintsDiv) {
+        hintsDiv.remove();
+    }
     
     // Disable buttons
     document.getElementById('sendBtn').disabled = true;
@@ -3005,12 +3014,66 @@ function updatePatientImageButton() {
             modal.classList.remove('show');
         }
         
-        // Add keyboard support for modal
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeImageModal();
+        // Add keyboard support for modal and shortcuts
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeImageModal();
+    }
+});
+
+// ===== KEYBOARD SHORTCUTS =====
+// Global keyboard event handler for shortcuts
+document.addEventListener('keydown', function(event) {
+    console.log('Key pressed:', event.key, 'Code:', event.code, 'Active element:', document.activeElement.tagName, 'ID:', document.activeElement.id);
+    
+    // Check if user is typing in a text input field (but allow shortcuts for dropdowns)
+    const activeElement = document.activeElement;
+    const isTextInput = (activeElement.tagName === 'INPUT' && 
+                        (activeElement.type === 'text' || 
+                         activeElement.type === 'password' || 
+                         activeElement.type === 'email' || 
+                         activeElement.type === 'search')) || 
+                       activeElement.tagName === 'TEXTAREA' ||
+                       activeElement.contentEditable === 'true';
+    
+    console.log('Is text input:', isTextInput, 'Recording state:', recordingState);
+    
+    // Space bar for start/stop recording (allow when not typing in text inputs)
+    if (event.code === 'Space' && !isTextInput) {
+        console.log('Spacebar detected - attempting to toggle recording');
+        event.preventDefault(); // Prevent page scrolling
+        const talkButton = document.getElementById('talkButton');
+        
+        if (talkButton) {
+            console.log('Talk button found, disabled:', talkButton.disabled);
+            if (!talkButton.disabled) {
+                console.log('Calling toggleRecording()');
+                toggleRecording();
             }
-        });
+        }
+        return;
+    }
+    
+    // Enter key for sending message
+    if (event.key === 'Enter' && !event.shiftKey) {
+        console.log('Enter key detected, recording state:', recordingState);
+        const sendButton = document.getElementById('sendBtn');
+        
+        // Special case: if editing the review transcript, allow Enter for line breaks
+        if (activeElement.id === 'reviewTranscript') {
+            console.log('In transcript editing mode - allowing normal Enter behavior');
+            return;
+        }
+        
+        // Send message if in review mode and not typing in a text input
+        if (recordingState === 'reviewing' && sendButton && !sendButton.disabled && !isTextInput) {
+            console.log('Calling sendReviewedMessage()');
+            event.preventDefault();
+            sendReviewedMessage();
+            return;
+        }
+    }
+});
         
         // Select a random scenario
         function selectRandomScenario() {
@@ -3916,43 +3979,3 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
