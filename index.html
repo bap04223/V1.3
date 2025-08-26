@@ -13,6 +13,7 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         
         /* CSS Variables for easy color scheme changes */
         :root {
@@ -989,6 +990,13 @@ a:hover {
     color: var(--primary-hover);
     text-shadow: 0 0 5px var(--accent-glow);
 }
+
+/* Force hide Deepgram settings container */
+#deepgramSettings {
+    display: none !important;
+}
+       
+  </style>
        
   </style>
 </head>
@@ -1061,6 +1069,18 @@ a:hover {
             Load Scenario Sets
         </button>
 </div>
+
+                    <div class="form-group">
+    <label>Speech-to-Text Provider:</label>
+    <div class="tts-provider-group">
+        <button class="tts-provider-btn active" id="browserSttBtn" onclick="selectSttProvider('browser')">
+            Browser STT
+        </button>
+        <button class="tts-provider-btn" id="deepgramSttBtn" onclick="selectSttProvider('deepgram')">
+            Deepgram
+        </button>
+    </div>
+</div>
         
 <!-- TTS Provider Selection -->
                 <div class="form-group">
@@ -1100,7 +1120,7 @@ a:hover {
                 
                 <!-- ElevenLabs TTS Settings -->
                 <div id="elevenlabsSettings" class="tts-settings elevenlabs-config" style="display: none;">
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label for="elevenlabsApiKey">ElevenLabs API Key:</label>
                         <input 
                             type="text" 
@@ -1113,7 +1133,7 @@ a:hover {
                         </small>
                     </div>
                     
-                    <div class="form-group">
+                   <div class="form-group" style="display: none;">
                         <label for="elevenlabsVoice">ElevenLabs Voice:</label>
                         <select id="elevenlabsVoice" disabled>
                             <option value="">Enter API key to load voices...</option>
@@ -1150,21 +1170,10 @@ a:hover {
                     </div>
                 </div>
 
-               <div class="form-group">
-    <label>Speech Recognition Provider:</label>
-    <div class="tts-provider-group">
-        <button class="tts-provider-btn active" id="browserSttBtn" onclick="selectSttProvider('browser')">
-            Browser STT
-        </button>
-        <button class="tts-provider-btn" id="deepgramSttBtn" onclick="selectSttProvider('deepgram')">
-            Deepgram (Medical)
-        </button>
-    </div>
-</div>
-
+               
 <!-- Deepgram STT Settings -->
 <div id="deepgramSettings" class="tts-settings elevenlabs-config" style="display: none;">
-    <div class="form-group">
+    <div class="form-group" style="display: none;">
         <label for="deepgramApiKey">Deepgram API Key:</label>
         <input 
             type="text" 
@@ -1177,10 +1186,10 @@ a:hover {
         </small>
     </div>
     
-    <div class="form-group">
+    <div class="form-group" style="display: none;">
         <label for="deepgramModel">Deepgram Model:</label>
         <select id="deepgramModel">
-            <option value="nova-2-medical">Nova 2 Medical (Recommended)</option>
+            <option value="nova-2-medical" selected>Nova 2 Medical (Recommended)</option>
             <option value="nova-2">Nova 2 General</option>
             <option value="nova">Nova</option>
             <option value="enhanced">Enhanced</option>
@@ -1188,11 +1197,11 @@ a:hover {
         </select>
     </div>
     
-    <div class="form-group">
+    <div class="form-group" style="display: none;">
         <label for="deepgramLanguage">Language:</label>
         <select id="deepgramLanguage">
+            <option value="en-GB" selected>English (UK)</option>
             <option value="en-US">English (US)</option>
-            <option value="en-GB">English (UK)</option>
             <option value="en-AU">English (AU)</option>
         </select>
     </div>
@@ -2281,7 +2290,6 @@ function hideReviewSection() {
         // Load sheet names from Google Sheets
         // ===== CHATBOT CONFIGURATION MANAGEMENT =====
 
-// Load chatbot configurations from Google Sheet
 async function loadChatbotConfigurations() {
     const configSheetId = document.getElementById('configSheetId').value;
     
@@ -2290,7 +2298,6 @@ async function loadChatbotConfigurations() {
         return;
     }
     
-    // Disable the load button and show loading state
     const loadBtn = document.getElementById('loadChatbotBtn');
     loadBtn.disabled = true;
     loadBtn.innerHTML = '⏳ Loading...';
@@ -2319,9 +2326,26 @@ async function loadChatbotConfigurations() {
                         name: row[0].trim(),
                         webhookUrl: row[1].trim(),
                         submitWebhookUrl: row[2].trim(),
-                        description: row[3] ? row[3].trim() : ''
+                        description: row[3] ? row[3].trim() : '',
+                        deepgramApiKey: row[4] ? row[4].trim() : '',
+                        elevenlabsApiKey: row[5] ? row[5].trim() : ''
                     });
                 }
+            }
+            
+            // Auto-populate API keys from the first configuration
+            if (chatbotConfigurations.length > 0) {
+                const firstConfig = chatbotConfigurations[0];
+                
+                if (firstConfig.deepgramApiKey) {
+                    document.getElementById('deepgramApiKey').value = firstConfig.deepgramApiKey;
+                }
+                if (firstConfig.elevenlabsApiKey) {
+    document.getElementById('elevenlabsApiKey').value = firstConfig.elevenlabsApiKey;
+    resetElevenLabsButtonState();
+    // Auto-load voices after API key is populated
+    loadElevenLabsVoices();
+}
             }
             
             populateChatbotDropdown();
@@ -2338,8 +2362,8 @@ async function loadChatbotConfigurations() {
         setButtonStatus('loadChatbotBtn', 'pending', 'Load Failed - Retry');
     }
 }
-
-// Populate the chatbot selection dropdown
+            
+        // Populate the chatbot selection dropdown
 function populateChatbotDropdown() {
     const select = document.getElementById('chatbotSelect');
     select.innerHTML = '<option value="">Select a chatbot configuration...</option>';
