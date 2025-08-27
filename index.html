@@ -1035,13 +1035,13 @@ a:hover {
             style="font-size: 14px;"
         >
         <button 
-            class="btn-secondary btn-status-pending" 
-            onclick="loadChatbotConfigurations()" 
-            style="width: 100%; margin-top: 10px; font-size: 14px;"
-            id="loadChatbotBtn"
-        >
-            Load Chatbot Configurations
-        </button>
+    class="btn-status-pending" 
+    onclick="loadChatbotConfigurations()" 
+    style="width: 100%; margin-top: 10px; font-size: 14px;"
+    id="loadChatbotBtn"
+>
+    Load Chatbot Configurations
+</button>
     </div>
         
     
@@ -1061,13 +1061,13 @@ a:hover {
             style="font-size: 14px;"
         >
         <button 
-            class="btn-secondary btn-status-pending" 
-            onclick="loadScenarioSets()" 
-            style="width: 100%; margin-top: 10px; font-size: 14px;"
-            id="loadSetsBtn"
-        >
-            Load Scenario Sets
-        </button>
+    class="btn-status-pending" 
+    onclick="loadScenarioSets()" 
+    style="width: 100%; margin-top: 10px; font-size: 14px;"
+    id="loadSetsBtn"
+>
+    Load Scenario Sets
+</button>
 </div>
 
                     <div class="form-group">
@@ -1254,9 +1254,9 @@ a:hover {
         </select>
     </div>
     
-    <button class="btn-secondary" onclick="selectRandomScenario()" style="width: 100%; margin-top: 10px;">
-        Random Scenario
-    </button>
+    <button class="btn-info" onclick="selectRandomScenario()" style="width: 100%; margin-top: 10px;">
+    Random Scenario
+</button>
     
             <!-- Patient Image Button -->
             <button 
@@ -2357,10 +2357,13 @@ async function loadChatbotConfigurations() {
         }
         
     } catch (error) {
-        console.error('Error loading chatbot configurations:', error);
-        showStatus('Error loading configurations. Check console for details.', 'error');
-        setButtonStatus('loadChatbotBtn', 'pending', 'Load Failed - Retry');
-    }
+    console.error('Error loading chatbot configurations:', error);
+    showStatus('Error loading configurations. Check console for details.', 'error');
+    // Keep button in pending state on error
+    loadBtn.disabled = false;
+    loadBtn.innerHTML = 'Load Failed - Retry';
+    loadBtn.className = 'btn-status-pending';
+}
 }
             
         // Populate the chatbot selection dropdown
@@ -2488,16 +2491,19 @@ async function loadScenarioSets() {
         }
         
     } catch (error) {
-        console.error('Error loading scenario sets:', error);
-        
-        if (error.message.includes('Failed to fetch')) {
-            showStatus('CORS error: Please ensure your Google Sheet is publicly accessible (Anyone with link can view)', 'error');
-        } else {
-            showStatus('Error loading scenario sets. Check console for details.', 'error');
-        }
-        
-        setButtonStatus('loadSetsBtn', 'pending', 'Load Failed - Retry');
+    console.error('Error loading scenario sets:', error);
+    
+    if (error.message.includes('Failed to fetch')) {
+        showStatus('CORS error: Please ensure your Google Sheet is publicly accessible (Anyone with link can view)', 'error');
+    } else {
+        showStatus('Error loading scenario sets. Check console for details.', 'error');
     }
+    
+    // Keep button in pending state on error
+    loadBtn.disabled = false;
+    loadBtn.innerHTML = 'Load Failed - Retry';
+    loadBtn.className = 'btn-status-pending';
+}
 }
 
 // Populate the scenario sets selection dropdown
@@ -4106,4 +4112,5 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
+
 
